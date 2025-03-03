@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap"
+        rel="stylesheet">
+    <title>Control Plane Policing (CoPP) - คู่มือภาษาไทย</title>
+    <style>
+        :root {
+            --primary-color: #1a73e8;
+            --secondary-color: #34a853;
+            --dark-blue: #174ea6;
+            --light-blue: #e8f0fe;
+            --warning-color: #ea4335;
+            --code-bg: #f5f5f5;
+            --border-color: #dadce0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Sarabun', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #202124;
+            background-color: #f8f9fa;
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--dark-blue));
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 1.8em;
+            color: var(--primary-color);
+            margin: 30px 0 15px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--light-blue);
+        }
+
+        h3 {
+            font-size: 1.4em;
+            color: var(--dark-blue);
+            margin: 20px 0 10px 0;
+        }
+
+        p {
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        ul,
+        ol {
+            margin: 15px 0;
+            padding-left: 25px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        strong {
+            color: var(--dark-blue);
+            font-weight: bold;
+        }
+
+        .code-block {
+            background-color: var(--code-bg);
+            border-left: 4px solid var(--primary-color);
+            padding: 15px;
+            margin: 20px 0;
+            overflow-x: auto;
+            border-radius: 4px;
+            font-family: 'Sarabun', 'Roboto', sans-serif;
+            /* font-family: 'Courier New', monospace; */
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .step-box {
+            background-color: var(--light-blue);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+
+        .step-title {
+            font-weight: bold;
+            font-size: 1.2em;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .step-number {
+            background-color: var(--primary-color);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .note {
+            background-color: #fff8e1;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .note-title {
+            font-weight: bold;
+            color: #b0790e;
+            margin-bottom: 5px;
+        }
+
+        .summary {
+            background-color: #e8f5e9;
+            border: 1px solid var(--secondary-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+
+        .summary h3 {
+            color: var(--secondary-color);
+            border-bottom: 1px solid #a5d6a7;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .command {
+            color: #0d47a1;
+            font-weight: bold;
+        }
+
+        .divider {
+            border: 0;
+            height: 1px;
+            background: var(--border-color);
+            margin: 30px 0;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+                border-radius: 0;
+            }
+
+            header {
+                padding: 20px 15px;
+                border-radius: 0;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            h2 {
+                font-size: 1.5em;
+            }
+
+            .code-block {
+                padding: 10px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Control Plane Policing (CoPP)</h1>
+            <p>คู่มือทฤษฎีและการกำหนดค่าสำหรับการปกป้อง Control Plane</p>
+        </header>
+
+        <section>
+            <h2>ทฤษฎี: Control Plane Policing (CoPP)</h2>
+            <p>CoPP เป็นฟีเจอร์สำหรับป้องกัน <strong>CPU ของ Control Plane</strong>
+                บนเราเตอร์จากทราฟฟิกที่อาจทำให้ระบบไม่เสถียร เช่น ทราฟฟิกที่เกิดจาก <strong>การโจมตี DoS
+                    หรือปริมาณแพ็กเก็ตที่สูงผิดปกติ</strong></p>
+
+            <p>CoPP ใช้ <strong>Modular QoS CLI (MQC)</strong> เพื่อควบคุมทราฟฟิกที่ส่งไปยัง Control Plane
+                โดยสามารถกำหนดให้</p>
+            <ul>
+                <li><strong>อนุญาต (permit)</strong></li>
+                <li><strong>ปฏิเสธ (drop)</strong></li>
+                <li><strong>จำกัดอัตราการส่ง (rate-limit)</strong></li>
+            </ul>
+
+            <p>CoPP จะจัดการกับทราฟฟิกที่ต้องใช้ <strong>การประมวลผลโดย CPU</strong> ของเราเตอร์ เช่น</p>
+            <ul>
+                <li><strong>แพ็กเก็ตที่ถูกล็อกโดย ACL</strong></li>
+                <li><strong>แพ็กเก็ตที่มีตัวเลือกพิเศษใน IP header (TTL options)</strong></li>
+                <li><strong>ทราฟฟิกควบคุม เช่น Routing Protocols (OSPF, EIGRP, BGP)</strong></li>
+                <li><strong>ทราฟฟิกการจัดการ เช่น Telnet, SSH, SNMP, NTP, HTTP</strong></li>
+            </ul>
+        </section>
+
+        <hr class="divider">
+
+        <section>
+            <h2>Scenario: การกำหนดค่า CoPP บน R1</h2>
+            <p>เป้าหมายของการกำหนดค่า CoPP ในแลบนี้คือ <strong>ใช้ MQC ในการป้องกัน CPU ของ Control Plane</strong>
+                โดยทำตามขั้นตอนดังนี้</p>
+
+            <ol>
+                <li><strong>กำหนด ACL เพื่อระบุทราฟฟิก</strong></li>
+                <li><strong>สร้าง Class Map เพื่อจำแนกทราฟฟิก</strong></li>
+                <li><strong>สร้าง Policy Map และกำหนดค่า policing</strong></li>
+                <li><strong>นำ Policy Map ไปใช้กับ Control Plane</strong></li>
+                <li><strong>ตรวจสอบผลลัพธ์ด้วย show commands</strong></li>
+            </ol>
+        </section>
+
+        <section>
+            <div class="step-box">
+                <div class="step-title">
+                    <div class="step-number">1</div>
+                    กำหนด ACL เพื่อระบุทราฟฟิก
+                </div>
+                <p>เราจะใช้ <strong>Extended ACL</strong> เพื่อระบุทราฟฟิกที่ต้องการควบคุม</p>
+
+                <div class="code-block">
+                    R1(config)# ip access-list extended TELNET <br>
+                    R1(config-ext-nacl)# permit tcp any any eq 23 <br>
+                    R1(config-ext-nacl)# exit <br><br>
+
+                    R1(config)# ip access-list extended EIGRP <br>
+                    R1(config-ext-nacl)# permit eigrp any any <br>
+                    R1(config-ext-nacl)# exit <br><br>
+
+                    R1(config)# ip access-list extended SSH <br>
+                    R1(config-ext-nacl)# permit tcp any any eq 22 <br>
+                    R1(config-ext-nacl)# exit <br><br>
+
+                    R1(config)# ip access-list extended ICMP <br>
+                    R1(config-ext-nacl)# permit icmp any any <br>
+                    R1(config-ext-nacl)# exit <br>
+                </div>
+
+                <div class="note">
+                    <div class="note-title">หมายเหตุ</div>
+                    <p>ACL ที่ไม่มีคำสั่ง <span class="command">permit</span> จะถูกส่งไปยัง Control Plane โดยค่าเริ่มต้น
+                    </p>
+                </div>
+            </div>
+
+            <div class="step-box">
+                <div class="step-title">
+                    <div class="step-number">2</div>
+                    กำหนด Class Map เพื่อจำแนกทราฟฟิก
+                </div>
+                <p>Class Map จะใช้ ACL ที่สร้างไว้เพื่อจำแนกทราฟฟิก</p>
+
+                <div class="code-block">
+                    R1(config)# class-map match-all CM-TELNET <br>
+                    R1(config-cmap)# match access-group name TELNET <br>
+                    R1(config-cmap)# exit <br><br>
+
+                    R1(config)# class-map match-all CM-EIGRP <br>
+                    R1(config-cmap)# match access-group name EIGRP <br>
+                    R1(config-cmap)# exit <br><br>
+
+                    R1(config)# class-map match-all CM-SSH <br>
+                    R1(config-cmap)# match access-group name SSH <br>
+                    R1(config-cmap)# exit <br><br>
+
+                    R1(config)# class-map match-all CM-ICMP <br>
+                    R1(config-cmap)# match access-group name ICMP <br>
+                    R1(config-cmap)# exit <br><br>
+                </div>
+            </div>
+
+            <div class="step-box">
+                <div class="step-title">
+                    <div class="step-number">3</div>
+                    กำหนด Policy Map และการควบคุมอัตราทราฟฟิก
+                </div>
+                <p>Policy Map จะกำหนด <strong>อัตราการส่งข้อมูล (policing) และการจัดการทราฟฟิก</strong></p>
+
+                <div class="code-block">
+                    R1(config)# policy-map PM-COPP <br><br>
+
+                    R1(config-pmap)# class CM-TELNET <br>
+                    R1(config-pmap-c)# police 8000 conform-action drop exceed-action drop <br>
+                    R1(config-pmap-c)# exit <br><br>
+
+                    R1(config-pmap)# class CM-EIGRP <br>
+                    R1(config-pmap-c)# police rate 20 pps conform-action transmit exceed-action drop <br>
+                    R1(config-pmap-c)# exit <br><br>
+
+                    R1(config-pmap)# class CM-SSH <br>
+                    R1(config-pmap-c)# police 50000 conform-action transmit exceed-action transmit <br>
+                    R1(config-pmap-c)# exit <br><br>
+
+                    R1(config-pmap)# class CM-ICMP <br>
+                    R1(config-pmap-c)# police rate 10 pps conform-action transmit exceed-action drop <br>
+                    R1(config-pmap-c)# exit <br><br>
+
+                    R1(config-pmap)# class class-default <br>
+                    R1(config-pmap-c)# police 12000 conform-action transmit exceed-action transmit <br>
+                    R1(config-pmap-c)# exit <br><br>
+                </div>
+
+                <h3>คำอธิบาย</h3>
+                <ul>
+                    <li><strong>TELNET</strong>: จำกัดที่ 8 kbps และ <strong>ดรอปทุกแพ็กเก็ต</strong></li>
+                    <li><strong>EIGRP</strong>: จำกัดที่ 20 pps, <strong>อนุญาตถ้าอยู่ในขีดจำกัด</strong>, ดรอปถ้าเกิน
+                    </li>
+                    <li><strong>SSH</strong>: จำกัดที่ 50 kbps, <strong>อนุญาตทุกแพ็กเก็ต</strong></li>
+                    <li><strong>ICMP</strong>: จำกัดที่ 10 pps, <strong>อนุญาตถ้าอยู่ในขีดจำกัด</strong>, ดรอปถ้าเกิน
+                    </li>
+                    <li><strong>class-default</strong>: จำกัดที่ 12 kbps, <strong>อนุญาตทุกแพ็กเก็ต</strong></li>
+                </ul>
+            </div>
+
+            <div class="step-box">
+                <div class="step-title">
+                    <div class="step-number">4</div>
+                    นำ Policy Map ไปใช้กับ Control Plane
+                </div>
+
+                <div class="code-block">
+                    R1(config)# control-plane <br>
+                    R1(config-cp)# service-policy input PM-COPP <br>
+                    R1(config-cp)# exit
+                </div>
+            </div>
+
+            <div class="step-box">
+                <div class="step-title">
+                    <div class="step-number">5</div>
+                    ตรวจสอบผลลัพธ์
+                </div>
+
+                <h3>ดูรายการ ACL ที่กำหนดไว้</h3>
+                <div class="code-block">
+                    R1# show access-lists
+                </div>
+
+                <h3>ดูรายการ Class Map</h3>
+                <div class="code-block">
+                    R1# show class-map
+                </div>
+
+                <h3>ดูรายละเอียด Policy Map</h3>
+                <div class="code-block">
+                    R1# show policy-map
+                </div>
+
+                <h3>ดูสถานะ CoPP และอัตราการจับแพ็กเก็ต</h3>
+                <div class="code-block">
+                    R1# show policy-map control-plane
+                </div>
+            </div>
+        </section>
+
+        <section class="summary">
+            <h3>สรุป</h3>
+            <ul>
+                <li><strong>CoPP ป้องกัน CPU ของ Control Plane จากทราฟฟิกที่ไม่พึงประสงค์</strong></li>
+                <li>ใช้ <strong>ACL เพื่อจำแนกทราฟฟิก</strong></li>
+                <li>ใช้ <strong>Class Map เพื่อนำ ACL มาแยกประเภทของทราฟฟิก</strong></li>
+                <li>ใช้ <strong>Policy Map เพื่อกำหนดการจัดการทราฟฟิก (Drop / Transmit / Rate-limit)</strong></li>
+                <li><strong>นำ Policy Map ไปใช้กับ Control Plane</strong> เพื่อบังคับใช้นโยบาย</li>
+            </ul>
+            <p>วิธีนี้ช่วยให้สามารถ <strong>ป้องกัน CPU จากการถูกใช้งานเกินขีดจำกัด
+                    และป้องกันการโจมตีที่อาจทำให้ระบบล่ม</strong> ได้</p>
+        </section>
+    </div>
+</body>
+
+</html>
