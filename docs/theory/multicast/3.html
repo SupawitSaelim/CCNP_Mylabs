@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>การแปลง Multicast IP เป็น MAC Address</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f7fa;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 2px solid #9b59b6;
+            margin-bottom: 30px;
+            background-color: #f4ecf7;
+            border-radius: 8px 8px 0 0;
+        }
+        h1 {
+            color: #8e44ad;
+            margin: 0;
+            font-size: 2.2em;
+        }
+        h2 {
+            color: #9b59b6;
+            border-left: 4px solid #9b59b6;
+            padding-left: 10px;
+            margin-top: 30px;
+        }
+        .section {
+            margin-bottom: 25px;
+            padding: 0 15px;
+        }
+        .highlight {
+            background-color: #f9f1fd;
+            border-left: 4px solid #9b59b6;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        .diagram {
+            padding: 10px;
+            background-color: #f4ecf7;
+            border-radius: 5px;
+            margin: 15px 0;
+            text-align: center;
+            font-style: italic;
+            color: #8e44ad;
+        }
+        .code {
+            font-family: monospace;
+            background-color: #f8f8f8;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            border-left: 4px solid #9b59b6;
+        }
+        .binary {
+            font-family: monospace;
+            letter-spacing: 1px;
+        }
+        .red {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .blue {
+            color: #3498db;
+            font-weight: bold;
+        }
+        .green {
+            color: #2ecc71;
+            font-weight: bold;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #9b59b6;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .step {
+            background-color: #f4ecf7;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            counter-increment: step-counter;
+        }
+        .step::before {
+            content: "ขั้นตอนที่ " counter(step-counter);
+            font-weight: bold;
+            color: #8e44ad;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        .navigation-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 40px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .nav-button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>การแปลง Multicast IP เป็น MAC Address</h1>
+        </header>
+        <div class="navigation-buttons">
+            <a href="1.html" class="nav-button">แนวคิด Multicast</a>
+            <a href="2.html" class="nav-button">Multicast บน Local LAN</a>
+            <a href="3.html" class="nav-button">Multicast IP to MAC mapping</a>
+        </div>
+
+        <div class="section">
+            <h2>บทนำ</h2>
+            <p>เอกสารนี้อธิบายกระบวนการแปลงหมายเลข IP Address แบบ Multicast ไปเป็น MAC Address สิ่งสำคัญที่ต้องเข้าใจคือ อุปกรณ์เครือข่ายทำงานกับ IP และ MAC Address ในรูปแบบเลขฐานสอง (Binary) เท่านั้น โดย IP Address มีขนาด 32 บิต ส่วน MAC Address มีขนาด 48 บิต การแสดงผลในรูปแบบเลขฐานสิบ (Decimal) สำหรับ IP Address และเลขฐานสิบหก (Hexadecimal) สำหรับ MAC Address เป็นเพียงรูปแบบที่ทำให้มนุษย์อ่านง่ายขึ้นเท่านั้น</p>
+        </div>
+
+        <div class="section">
+            <h2>โครงสร้างของ Multicast IP Address</h2>
+            <p>IP Address มีขนาด 32 บิต แบ่งเป็น 4 ชุด (Octet) ชุดละ 8 บิต สำหรับ IP Multicast จะใช้ Class D Address Range โดย 4 บิตแรกของ Octet แรกจะถูกกำหนดค่าตายตัวเป็น 1110 ซึ่งแสดงด้วยสัญลักษณ์ 224.0.0.0/4 โดย /4 หมายความว่า 4 บิตแรกถูกกำหนดค่าคงที่เป็น 1110 เสมอ</p>
+            
+            <div class="diagram">
+                <img src="https://cdn.networkacademy.io/sites/default/files/2024-06/multicast-ip-address-binary.svg"><br>
+                รูปที่ 1: โครงสร้าง Multicast IP Address
+            </div>
+            
+            <p>โครงสร้างแบบนี้ทำให้ช่วง IP ที่ใช้สำหรับ Multicast คือ 224.0.0.0 - 239.255.255.255 ซึ่งในรูปแบบเลขฐานสองจะเป็น:</p>
+            
+            <div class="code">
+                <span class="binary">เริ่มจาก</span><br>
+                <span class="red">1110</span>0000.00000000.00000000.00000000 (224.0.0.0)<br>
+                <span class="binary">ถึง</span><br>
+                <span class="red">1110</span>1111.11111111.11111111.11111111 (239.255.255.255)
+            </div>
+            
+            <p>สังเกตว่าส่วนที่เป็นสีแดงคือบิตที่ถูกกำหนดค่าคงที่และไม่เปลี่ยนแปลง</p>
+        </div>
+
+        <div class="section">
+            <h2>โครงสร้างของ Multicast MAC Address</h2>
+            <p>MAC Address มีขนาด 48 บิต แบ่งเป็น 6 ชุด (Octet) ชุดละ 8 บิต สำหรับ IP Multicast จะใช้ MAC Address Prefix คือ 0x0100.5E โดย 25 บิตแรกจะถูกกำหนดค่าตายตัวเป็น 00000001.00000000.01011110.0</p>
+            
+            <div class="diagram">
+                <img src="https://cdn.networkacademy.io/sites/default/files/2024-06/multicast-mac-address-binary.svg"><br>
+                รูปที่ 2: โครงสร้าง Multicast MAC Address
+            </div>
+            
+            <p>โครงสร้างนี้ทำให้ช่วง Ethernet MAC Address ที่ใช้สำหรับ Multicast คือ 0100.5E00.0000 ถึง 0100.5E7F.FFFF ซึ่งในรูปแบบเลขฐานสองจะเป็น:</p>
+            
+            <div class="code">
+                <span class="binary">เริ่มจาก</span><br>
+                <span class="red">00000001.00000000.01011110.0</span>0000000.00000000.00000000<br>
+                <span class="binary">ถึง</span><br>
+                <span class="red">00000001.00000000.01011110.0</span>1111111.11111111.11111111
+            </div>
+            
+            <p>สังเกตว่าส่วนที่เป็นสีแดงคือบิตที่ถูกกำหนดค่าคงที่และไม่เปลี่ยนแปลง</p>
+        </div>
+
+        <div class="section">
+            <h2>การแปลง Multicast IP เป็น MAC</h2>
+            <p>กระบวนการแปลง Multicast IP Address เป็น MAC Address คือการนำ 23 บิตสุดท้ายของ IP Address ไปใส่ใน 23 บิตสุดท้ายของ Ethernet Multicast Address</p>
+            
+            <div class="diagram">
+                <img src="https://cdn.networkacademy.io/sites/default/files/2024-06/multicast-ip-to-mac-mapping.svg"><br>
+                รูปที่ 3: การแปลง Multicast IP เป็น MAC
+            </div>
+            
+            <div class="highlight">
+                <p>สิ่งสำคัญที่ต้องสังเกตในกระบวนการนี้:</p>
+                <ul>
+                    <li>Multicast IP Address ประกอบด้วย 4 บิตคงที่ (Multicast IP Prefix สีแดง) และ 28 บิตที่เปลี่ยนแปลงได้</li>
+                    <li>Multicast MAC Address ประกอบด้วย 25 บิตคงที่ (Multicast MAC Prefix สีแดง) และ 23 บิตที่เปลี่ยนแปลงได้</li>
+                    <li>เนื่องจาก Multicast MAC มีเพียง 23 บิตที่ไม่คงที่ จึงสามารถนำเพียง 23 บิตของ IP Address มาแมปลงใน MAC Address ได้ ทำให้มี 5 บิตของ IP Address (สีเทา) ที่ไม่สามารถแมปได้</li>
+                </ul>
+            </div>
+            
+            <p>ซึ่งหมายความว่า ไม่มี Multicast MAC Address เพียงพอที่จะแมปกับทุก Multicast IP Address เนื่องจากไม่มีพื้นที่เพียงพอที่จะแมป 28 บิตที่เปลี่ยนแปลงได้ของ Multicast IP Address ลงใน 23 บิตที่เปลี่ยนแปลงได้ของ Multicast MAC Address ในทางปฏิบัติ นี่หมายความว่า 2^5 (32) IP Address จะแมปไปยัง MAC Address เดียวกัน</p>
+            
+            <div class="diagram">
+                <img src="https://cdn.networkacademy.io/sites/default/files/2024-06/32-multicast-ip-addresses-to-a-single-MAC.svg"><br>
+                รูปที่ 4: 32 Multicast IP Address แมปไปยัง MAC เดียวกัน
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>ผลกระทบในทางปฏิบัติ</h2>
+            <p>ผลกระทบในทางปฏิบัติของความไม่มีประสิทธิภาพในการแมปนี้คือ โฮสต์อาจได้รับ Multicast Frame ที่ระดับ Ethernet สำหรับกลุ่ม IP Multicast ที่แตกต่างกันซึ่งตรงกับ MAC Address เดียวกัน</p>
+            
+            <p>สวิตช์ LAN ทำสำเนา Multicast โดยการแมป Multicast MAC Address ไปยังพอร์ตของสวิตช์ที่มีผู้รับที่สนใจเชื่อมต่ออยู่ อย่างไรก็ตาม เนื่องจาก MAC Address หนึ่งแทน 32 Multicast IP Address โฮสต์ที่สนใจรับ Multicast บนกลุ่ม 1 จะได้รับ Multicast Stream หลายรายการจาก 31 IP Address อื่นที่ตรงกับ MAC เดียวกัน เนื่องจากสวิตช์ LAN ดูเฉพาะส่วนหัว Layer 2 และ Destination MAC Address เดียวกันสำหรับ 32 Destination Multicast IP</p>
+            
+            <div class="diagram">
+                <img src="https://cdn.networkacademy.io/sites/default/files/2024-06/multicast-MAC-inefficiency.svg"><br>
+                รูปที่ 5: ความไม่มีประสิทธิภาพของ Multicast MAC
+            </div>
+            
+            <p>ในที่สุด ผู้รับทั้งสองฝั่ง (PC2 และ PC4) จะได้รับทั้งสองสตรีม แม้ว่าแต่ละฝั่งต้องการเพียงหนึ่งในสตรีมเท่านั้น ความไม่มีประสิทธิภาพนี้เพิ่มภาระให้กับเครือข่ายและโฮสต์ปลายทางพร้อมกัน</p>
+        </div>
+
+        <div class="section">
+            <h2>วิธีหลีกเลี่ยงปัญหานี้</h2>
+            <p>วิธีที่มีประสิทธิภาพมากที่สุดในการหลีกเลี่ยงปัญหานี้คือ ตรวจสอบให้แน่ใจว่าแอปพลิเคชันไม่ใช้หมายเลข IPv4 แบบ Multicast ที่ตรงกับ Multicast MAC Address เดียวกัน ตัวอย่างเช่น หากแอปพลิเคชันหนึ่งใช้ที่อยู่ Multicast 239.1.1.1 ให้ตรวจสอบว่า 31 IPv4 Address อื่นที่ตรงกับ MAC 0100.5E01.0101 ไม่ถูกใช้</p>
+            
+            <p>ในปัจจุบัน สวิตช์สมัยใหม่ส่งต่อ Multicast Traffic ตาม Destination MAC และ Destination IPv4 Address แม้จะทำหน้าที่เป็นเพียง Layer 2 Ethernet Bridge ซึ่งช่วยบรรเทาปัญหานี้และทำให้อุปกรณ์สามารถทำสำเนา Multicast Traffic ไปยังผู้รับที่สนใจที่เชื่อมต่ออยู่เท่านั้น อย่างไรก็ตาม ไม่ใช่ทุกแพลตฟอร์มและผู้ผลิตจะรองรับความสามารถนี้ ดังนั้นวิธีที่แนะนำคือหลีกเลี่ยงการใช้ Multicast IP/MAC Address ที่ทับซ้อนกัน</p>
+        </div>
+
+        <div class="section">
+            <h2>การแปลง Multicast IP เป็น MAC Address</h2>
+            <p>คุณอาจจะไม่จำเป็นต้องแปลง Multicast IP Address เป็น Multicast MAC Address ด้วยตนเอง แต่เพื่อให้เข้าใจแนวคิดได้ง่ายขึ้น เรามาดูวิธีการแปลงหมายเลข 239.5.5.5 เป็น Multicast MAC Address กัน</p>
+            
+            <div class="step">
+                <p>แปลง Multicast IP เป็นเลขฐานสอง</p>
+                <div class="code">
+                    239.5.5.5 = 11101111.00000101.00000101.00000101<br>
+                    <span class="blue">ส่วนสีน้ำเงินคือ 23 บิตสุดท้าย</span>
+                </div>
+            </div>
+            
+            <div class="step">
+                <p>นำ 23 บิตสุดท้ายไปแมปกับ Multicast MAC Prefix ที่รู้จักกันทั่วไป</p>
+                <div class="code">
+                    Multicast MAC Prefix คือ <span class="red">00000001.00000000.01011110.0</span>xxxxxxx.xxxxxxxx.xxxxxxxx<br>
+                    ส่วนสีแดงคือบิต Prefix ที่คงที่<br><br>
+                    
+                    แมป 23 บิตสุดท้ายของ IP (สีน้ำเงิน) ลงใน MAC Prefix (สีแดง)<br>
+                    ผลลัพธ์คือ <span class="red">00000001.00000000.01011110.0</span>0000101.00000101.00000101
+                </div>
+            </div>
+            
+            <div class="step">
+                <p>แปลงผลลัพธ์เป็นเลขฐานสิบหก (HEX)</p>
+                <div class="code">
+                    0x0100.5E05.0505
+                </div>
+                <p>นี่คือ MAC Address ที่จะถูกใช้เมื่อส่งไปยังกลุ่ม 239.5.5.5</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>การแปลง Multicast MAC เป็น IP Address</h2>
+            <p>สำหรับการดำเนินการย้อนกลับ เรามาลองแปลง Multicast MAC 0100.5E07.FE01 เป็นชุด IP Address ที่เกี่ยวข้อง</p>
+            
+            <div class="step">
+                <p>แปลง Multicast MAC เป็นเลขฐานสอง</p>
+                <div class="code">
+                    0x0100.5E07.FE01 = 00000001.00000000.01011110.00000111.11111110.00000001
+                </div>
+            </div>
+            
+            <div class="step">
+                <p>นำ 23 บิตสุดท้ายไปแมปกับ Multicast IP Prefix ที่รู้จักกันทั่วไป</p>
+                <div class="code">
+                    Multicast IP Prefix คือ <span class="red">1110</span><span class="green">yyyyy.y</span>xxxxxxx.xxxxxxxx.xxxxxxxx<br>
+                    ส่วนสีแดงคือบิต Prefix ที่คงที่ ส่วนสีเขียวคือ 5 บิตที่สูญหายระหว่างการแปลง<br>
+                    เราตั้งค่าเป็น 0 เพื่อหา IP Address แรกจากทั้งหมด 32 Address<br><br>
+                    
+                    แมป 23 บิตสุดท้าย (สีน้ำเงิน) ลงใน IP Prefix (สีแดง)<br>
+                    ผลลัพธ์คือ <span class="red">1110</span><span class="green">00000.0</span>0000111.11111110.00000001
+                </div>
+            </div>
+            
+            <div class="step">
+                <p>แปลงผลลัพธ์เป็นเลขฐานสิบ (Decimal)</p>
+                <div class="code">
+                    224.7.254.1
+                </div>
+                <p>นี่คือ IP Address แรกจาก 32 Address ที่ตรงกับ 0100.5E07.FE01</p>
+            </div>
+            
+            <div class="step">
+                <p>หา 31 IP Address ที่เหลือ</p>
+                <div class="code">
+                    เมื่อเราเพิ่ม +128 ให้กับ Octet ที่สอง แล้วเพิ่ม +1 ให้กับ Octet แรก โดยทำซ้ำ<br>
+                    ที่ 2 -> 224.(7+128).254.1 = 224.135.254.1<br>
+                    ที่ 3 -> 225.7.254.1<br>
+                    ที่ 4 -> 225.135.254.1<br>
+                    ที่ 5 -> 226.7.254.1<br>
+                    .<br>
+                    ที่ 31 -> 239.7.254.1<br>
+                    ที่ 32 -> 239.135.254.1
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Ref: https://www.networkacademy.io/ccie-enterprise/multicast/multicast-on-the-local-lan</p>
+        </div>
+    </div>
+</body>
+</html>

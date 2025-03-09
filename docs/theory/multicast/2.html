@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สรุปการทำงานของ Multicast บน Local LAN</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f7fa;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 2px solid #3498db;
+            margin-bottom: 30px;
+            background-color: #ecf0f1;
+            border-radius: 8px 8px 0 0;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin: 0;
+            font-size: 2.2em;
+        }
+
+        h2 {
+            color: #3498db;
+            border-left: 4px solid #3498db;
+            padding-left: 10px;
+            margin-top: 30px;
+        }
+
+        .section {
+            margin-bottom: 25px;
+            padding: 0 15px;
+        }
+
+        .highlight {
+            background-color: #f1f8ff;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .diagram {
+            padding: 10px;
+            background-color: #e8f4fc;
+            border-radius: 5px;
+            margin: 15px 0;
+            text-align: center;
+            font-style: italic;
+            color: #2980b9;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        .navigation-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 40px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .nav-button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>การทำงานของ Multicast บน Local LAN</h1>
+        </header>
+        <div class="navigation-buttons">
+            <a href="1.html" class="nav-button">แนวคิด Multicast</a>
+            <a href="2.html" class="nav-button">Multicast บน Local LAN</a>
+            <a href="3.html" class="nav-button">Multicast IP to MAC mapping</a>
+        </div>
+
+        <div class="section">
+            <h2>บทนำ</h2>
+            <p>เอกสารนี้อธิบายถึงการทำงานของ Multicast บน Local LAN โดยเริ่มจากพื้นฐานกระบวนการ Encapsulation
+                จนถึงความแตกต่างระหว่าง Unicast, Broadcast และ Multicast</p>
+        </div>
+
+        <div class="section">
+            <h2>กระบวนการ Encapsulation</h2>
+            <p>Encapsulation คือกระบวนการเพิ่ม header รอบข้อมูลเมื่อข้อมูลเคลื่อนลงตามชั้นของโมเดล OSI
+                โดยแต่ละชั้นจะทำหน้าที่เฉพาะและเพิ่ม header ของชั้นนั้นๆ ก่อนส่งต่อไปยังชั้นถัดไป
+                เมื่อข้อมูลถูกส่งถึงปลายทาง จะเกิดกระบวนการ Decapsulation ในทิศทางตรงกันข้าม</p>
+
+            <div class="diagram">
+                <img src="https://cdn.networkacademy.io/sites/default/files/2024-06/data-encapsulation.svg"
+                    alt="Multicast"><br>
+                รูปที่ 1: แสดงกระบวนการ Data Encapsulation
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Encapsulation ใน Unicast</h2>
+            <p>ในการสื่อสารแบบ Unicast เช่น เมื่อ PC1 เปิดเว็บเพจผ่าน HTTP:</p>
+            <ol>
+                <li>PC1 ตรวจสอบว่า IP ปลายทางอยู่ใน Subnet เดียวกันหรือไม่</li>
+                <li>ถ้าไม่อยู่ใน Subnet เดียวกัน จะต้องส่งผ่าน Default Gateway</li>
+                <li>ก่อนส่งข้อมูล PC1 ต้องรู้ MAC Address ของ Gateway โดยใช้ ARP Request</li>
+                <li>Default Gateway ตอบกลับด้วย ARP Response แบบ Unicast</li>
+                <li>หลังจากนั้น PC1 จึงมีข้อมูลเพียงพอในการ Encapsulate ข้อมูลและส่งไปยัง LAN</li>
+            </ol>
+
+            <div class="highlight">
+                สิ่งสำคัญที่ต้องเข้าใจคือ ข้อมูลใน Layer 3 Header (SRC_IP และ DST_IP) ไม่เปลี่ยนแปลงตลอดทาง แต่ข้อมูลใน
+                Layer 2 Header (SRC_MAC และ DST_MAC) จะเปลี่ยนแปลงทุกครั้งที่ข้ามไปยัง Layer 3 Hop ใหม่
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>ปัญหาของการใช้ Multicast บน LAN</h2>
+            <p>เมื่อนำหลักการของ Unicast มาประยุกต์ใช้กับ Multicast บน LAN จะเกิดคำถามสำคัญ:</p>
+            <ul>
+                <li>ควรใช้ MAC Address ใดเป็น Destination?</li>
+                <li>สวิตช์ LAN จะรู้ได้อย่างไรว่าควรส่งต่อ Frame ไปยัง Port ใดบ้าง?</li>
+                <li>สวิตช์ LAN จะแยกแยะ Multicast Stream ต่างๆ ได้อย่างไร?</li>
+                <li>อุปกรณ์ปลายทางจะประมวลผล Frame ที่ไม่ได้มี MAC Address ตรงกับของตนเองหรือไม่?</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>วิธีทำงานของ Multicast บน LAN</h2>
+            <p>Multicast ทำงานแตกต่างจาก Unicast และ Broadcast ที่ระดับ Ethernet โดยมีความแตกต่างหลักคือการใช้ MAC
+                Address ปลายทาง:</p>
+
+            <table>
+                <tr>
+                    <th>ประเภท</th>
+                    <th>Destination MAC Address</th>
+                </tr>
+                <tr>
+                    <td>Unicast</td>
+                    <td>MAC Address ทางกายภาพของอินเตอร์เฟสปลายทาง (ค้นหาด้วย ARP)</td>
+                </tr>
+                <tr>
+                    <td>Broadcast</td>
+                    <td>MAC Address สำหรับ Broadcast คือ 0xFFFF.FFFF.FFFF</td>
+                </tr>
+                <tr>
+                    <td>Multicast</td>
+                    <td>สร้างจาก IP Address ของ Multicast ด้วยอัลกอริทึมเฉพาะ (ไม่ใช้ ARP)</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Multicast MAC Address</h2>
+            <p>IP Address ของ Multicast (224.0.0.0 ถึง 239.255.255.255) จะถูกแมปไปยัง Ethernet MAC Address ในช่วง
+                0100.5E00.0000 ถึง 0100:5E7F:FFFF ตามอัลกอริทึมที่กำหนดโดย IANA</p>
+
+            <div class="diagram">
+                <img src="https://cdn.networkacademy.io/sites/default/files/2024-06/encapsulation-in-multicast-no-arp.svg">
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Control-Plane ของ Multicast</h2>
+            <p>สวิตช์ LAN ต้องรู้ว่าโฮสต์ใดสนใจ Multicast Group ใด และเชื่อมต่อกับพอร์ตใด โดยใช้โปรโตคอลดังนี้:</p>
+
+            <p><strong>IGMP (Internet Group Management Protocol)</strong>: โฮสต์ใช้ IGMP เพื่อแจ้งให้เราเตอร์ Multicast
+                ในเครือข่ายท้องถิ่นทราบว่าต้องการรับ Traffic สำหรับกลุ่ม Multicast เฉพาะ</p>
+
+            <p><strong>PIM (Protocol Independent Multicast)</strong>: เราเตอร์ที่รองรับ Multicast ใช้ PIM
+                เพื่อแลกเปลี่ยนข้อมูลกลุ่ม Multicast และสร้าง Multicast Distribution Tree</p>
+
+            <div class="highlight">
+                สวิตช์ LAN รับฟัง IGMP Membership Message จากโฮสต์และ PIM HELLO Message จากเราเตอร์
+                เพื่อสร้างตารางการส่งต่อ Multicast
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Data-Plane ของ Multicast</h2>
+            <p>จากการรับฟัง IGMP และ PIM Message สวิตช์จะสร้างตารางที่มีข้อมูลผู้รับที่เชื่อมต่อสำหรับแต่ละกลุ่ม
+                Multicast และทำการสำเนา Frame ไปยังพอร์ตที่เกี่ยวข้องเท่านั้น</p>
+
+            <div class="diagram">
+                <img src="https://cdn.networkacademy.io/sites/default/files/2024-06/multicast-on-the-lan-data-plane.svg"><br>
+                การทำงานของ Multicast บน LAN - Data Plane
+            </div>
+
+            <p>ด้วยวิธีนี้ เฉพาะผู้รับที่สนใจเท่านั้นที่จะได้รับข้อมูล Multicast
+                ซึ่งเป็นข้อได้เปรียบหลักด้านประสิทธิภาพของ Multicast</p>
+        </div>
+
+        <div class="footer">
+            <p>Ref: https://www.networkacademy.io/ccie-enterprise/multicast/multicast-on-the-local-lan</p>
+        </div>
+    </div>
+</body>
+
+</html>
