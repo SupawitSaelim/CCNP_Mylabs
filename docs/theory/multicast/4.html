@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สรุปข้อมูล IGMP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+
+        h1 {
+            color: #0066cc;
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #0066cc;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: #0066cc;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-left: 5px solid #0066cc;
+            padding-left: 10px;
+        }
+
+        .keyword {
+            background-color: #e6f2ff;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-weight: bold;
+            color: #0066cc;
+        }
+
+        .image-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .caption {
+            text-align: center;
+            font-style: italic;
+            color: #666;
+            margin-top: 8px;
+        }
+
+        .highlights {
+            background-color: #f0f7ff;
+            border-left: 4px solid #0066cc;
+            padding: 15px;
+            border-radius: 0 5px 5px 0;
+            margin: 20px 0;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .highlights h3 {
+            margin-top: 0;
+            color: #0066cc;
+        }
+
+        ul {
+            padding-left: 25px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #0066cc;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f7ff;
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 40px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .nav-button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>โปรโตคอล IGMP (Internet Group Management Protocol)</h1>
+        <div class="navigation-buttons">
+            <a href="1.html" class="nav-button">แนวคิด Multicast</a>
+            <a href="2.html" class="nav-button">Multicast บน Local LAN</a>
+            <a href="3.html" class="nav-button">Multicast IP to MAC mapping</a>
+            <a href="4.html" class="nav-button">IGMP</a>
+            <a href="5.html" class="nav-button">IGMP Snooping</a>
+        </div>
+
+        <div class="highlights">
+            <h3>สรุปสาระสำคัญ</h3>
+            <p>IGMP คือโปรโตคอลที่ใช้สำหรับการจัดการกลุ่มมัลติคาสต์ในเครือข่าย IPv4
+                โดยทำหน้าที่เป็นตัวกลางในการสื่อสารระหว่างอุปกรณ์ต้นทางและเราท์เตอร์มัลติคาสต์ในการแจ้งความต้องการรับหรือหยุดรับข้อมูลมัลติคาสต์
+            </p>
+        </div>
+
+        <h2>ทำไมต้องใช้ IGMP?</h2>
+        <p>เมื่อเราท์เตอร์มัลติคาสต์ได้รับข้อมูลมัลติคาสต์จากแหล่งที่มา
+            เราท์เตอร์จำเป็นต้องรู้ว่าควรส่งข้อมูลนี้ไปยังเซกเมนต์เครือข่ายใดบ้าง
+            เพื่อให้ถึงอุปกรณ์ที่ต้องการรับข้อมูลเหล่านั้น โดย <span class="keyword">IGMP</span>
+            จะช่วยให้เราท์เตอร์สามารถตรวจสอบว่ามีอุปกรณ์ใดในเครือข่ายที่สนใจรับข้อมูลมัลติคาสต์จากกลุ่มที่ระบุหรือไม่
+        </p>
+
+        <div class="image-container">
+            <img src="https://cdn.networkacademy.io/sites/default/files/2024-06/why-do-we-need-igmp.svg"
+                alt="ภาพแสดงการทำงานของ IGMP">
+            <div class="caption">รูปที่ 1: แสดงการทำงานของ IGMP ในเครือข่าย</div>
+        </div>
+
+        <h2>IGMPv1 (IGMP เวอร์ชัน 1)</h2>
+        <p>IGMPv1 ถูกแนะนำในปี 1989 ผ่าน RFC 1112
+            โดยมีกลไกพื้นฐานแบบคำถาม-คำตอบที่ช่วยให้เราท์เตอร์มัลติคาสต์สามารถตรวจสอบว่ามีอุปกรณ์ใดที่ต้องการรับข้อมูลมัลติคาสต์
+        </p>
+
+        <div class="image-container">
+            <img src="https://cdn.networkacademy.io/sites/default/files/2024-06/igmpv1-overview.svg"
+                alt="ภาพรวมการทำงานของ IGMPv1">
+            <div class="caption">รูปที่ 2: ภาพรวมการทำงานของ IGMPv1</div>
+        </div>
+
+        <h2>ข้อความหลักของ IGMPv1</h2>
+        <table>
+            <tr>
+                <th>ประเภทข้อความ</th>
+                <th>คำอธิบาย</th>
+            </tr>
+            <tr>
+                <td><span class="keyword">Membership Query</span></td>
+                <td>เราท์เตอร์มัลติคาสต์ส่งคำขอไปยังที่อยู่ 224.0.0.1 (all hosts local multicast)
+                    เพื่อตรวจสอบว่ามีโฮสต์ใดต้องการเป็นสมาชิกของกลุ่มมัลติคาสต์ ช่วงเวลาค่าเริ่มต้นในการส่ง Query คือทุก
+                    60 วินาที</td>
+            </tr>
+            <tr>
+                <td><span class="keyword">Membership Report</span></td>
+                <td>โฮสต์ที่ต้องการรับข้อมูลมัลติคาสต์จะตอบกลับด้วย Membership Report ทุกครั้งที่ได้รับ Query</td>
+            </tr>
+        </table>
+
+        <h2>รูปแบบแพ็คเก็ต IGMPv1</h2>
+        <p>แพ็คเก็ต IGMPv1 มีขนาด 64 บิต (8 ไบต์) ประกอบด้วย 5 ฟิลด์</p>
+
+        <div class="image-container">
+            <img src="https://cdn.networkacademy.io/sites/default/files/2024-06/igmpv1-packet-format.svg"
+                alt="รูปแบบแพ็คเก็ต IGMPv1">
+            <div class="caption">รูปที่ 3: รูปแบบแพ็คเก็ต IGMPv1</div>
+        </div>
+
+        <div class="image-container">
+            <img src="https://cdn.networkacademy.io/sites/default/files/2024-06/igmpv1-membership-query-wireshark.jpg"
+                alt="Wireshark แสดง IGMPv1 Membership Query">
+            <div class="caption">รูปที่ 4: การวิเคราะห์แพ็คเก็ต IGMPv1 Membership Query ด้วย Wireshark</div>
+        </div>
+
+        <div class="image-container">
+            <img src="https://cdn.networkacademy.io/sites/default/files/2024-06/igmpv1-membership-report-wireshark.jpg"
+                alt="Wireshark แสดง IGMPv1 Membership Report">
+            <div class="caption">รูปที่ 5: การวิเคราะห์แพ็คเก็ต IGMPv1 Membership Report ด้วย Wireshark</div>
+        </div>
+
+        <h2>ข้อด้อยของ IGMPv1</h2>
+        <p>IGMPv1 ไม่มีกลไกสำหรับการออกจากกลุ่ม (Leave Group) เมื่อโฮสต์ไม่ต้องการรับข้อมูลมัลติคาสต์อีกต่อไป
+            โฮสต์จะหยุดตอบกลับข้อความ Membership Query จากเราท์เตอร์ เราท์เตอร์จะรอเวลา 3 เท่าของ Query-interval (180
+            วินาที) จึงจะหยุดส่งข้อมูลมัลติคาสต์ไปยังเซกเมนต์นั้น</p>
+
+        <div class="highlights">
+            <h3>สรุปสำคัญของ IGMPv1</h3>
+            <ul>
+                <li><strong>จุดประสงค์:</strong>
+                    เป็นโปรโตคอลแบบคำถาม-คำตอบอย่างง่ายที่ช่วยให้เราท์เตอร์สามารถตรวจสอบกลุ่มมัลติคาสต์ที่มีสมาชิกใช้งานอยู่ในเครือข่ายที่เชื่อมต่อโดยตรง
+                </li>
+                <li><strong>ประเภทข้อความ:</strong>
+                    <ul>
+                        <li>Membership Query: เราท์เตอร์ส่งข้อความ Query เพื่อตรวจสอบผู้รับข้อมูลมัลติคาสต์</li>
+                        <li>Membership Report: โฮสต์ตอบกลับด้วย Report เมื่อต้องการเข้าร่วมกลุ่มมัลติคาสต์</li>
+                    </ul>
+                </li>
+                <li><strong>ข้อด้อย:</strong> ไม่มีข้อความสำหรับการออกจากกลุ่ม
+                    ทำให้การจัดการทรัพยากรเครือข่ายไม่มีประสิทธิภาพ</li>
+                <li><strong>การใช้งาน:</strong> IGMPv1 ถือเป็นเทคโนโลยีเก่าและไม่ได้ใช้งานอีกต่อไป อุปกรณ์ Cisco ใช้
+                    IGMP เวอร์ชัน 2 เป็นค่าเริ่มต้น</li>
+                <li><strong>โครงสร้างแพ็คเก็ต:</strong> ข้อความ IGMPv1 จะถูกห่อหุ้มภายในแพ็คเก็ต IP
+                    โดยไม่ใช้ส่วนหัวของชั้น Transport</li>
+            </ul>
+        </div>
+    </div>
+    <footer>
+        <p>Ref: https://www.networkacademy.io/ccie-enterprise/multicast/multicast-on-the-local-lan</p>
+    </footer>
+</body>
+
+</html>
