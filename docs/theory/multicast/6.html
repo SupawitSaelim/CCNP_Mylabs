@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>บทสรุป PIM และ Multicast Distribution Trees</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        header {
+            background-color: #0056b3;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2em;
+        }
+
+        h2 {
+            color: #0056b3;
+            border-bottom: 2px solid #0056b3;
+            padding-bottom: 5px;
+            margin-top: 30px;
+        }
+
+        .section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .highlight {
+            background-color: #e9f5ff;
+            padding: 15px;
+            border-left: 4px solid #0056b3;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .important {
+            font-weight: bold;
+            color: #d9534f;
+        }
+
+        .image-container {
+            margin: 25px auto;
+            text-align: center;
+        }
+
+        .image-placeholder {
+            max-width: 100%;
+            height: auto;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px auto;
+            background-color: #f9f9f9;
+        }
+
+        .image-caption {
+            font-style: italic;
+            color: #666;
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .key-points {
+            background-color: #f0f7ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .key-points h3 {
+            margin-top: 0;
+            color: #0056b3;
+        }
+
+        figcaption {
+            font-style: italic;
+            text-align: center;
+            color: #666;
+            margin-top: 8px;
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 40px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .nav-button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Protocol Independent Multicast (PIM) และ Multicast Distribution Trees</h1>
+    </header>
+    <div class="navigation-buttons">
+        <a href="1.html" class="nav-button">แนวคิด Multicast</a>
+        <a href="2.html" class="nav-button">Multicast บน Local LAN</a>
+        <a href="3.html" class="nav-button">Multicast IP to MAC mapping</a>
+        <a href="4.html" class="nav-button">IGMP</a>
+        <a href="5.html" class="nav-button">IGMP Snooping</a>
+        <a href="6.html" class="nav-button">PIM</a>
+        <a href="7.html" class="nav-button">Dense Mode</a>
+        <a href="8.html" class="nav-button">Summary Commands</a>
+    </div>
+
+    <div class="section">
+        <h2>แนวคิดเกี่ยวกับ Multicast Routing</h2>
+        <p>ในอดีต นักวิจัยเครือข่ายคิดว่าต้องมีโปรโตคอลการจัดเส้นทาง Multicast
+            แยกต่างหากที่ทำงานคู่ขนานกับโปรโตคอลการจัดเส้นทาง Unicast เพื่อให้ IP Multicast ทำงานได้ โปรโตคอลเช่น MOSPF
+            (Multicast Open Shortest Path First) และ DVMRP (Distance Vector Multicast Routing Protocol)
+            ถูกนำมาใช้ในเวลานั้น</p>
+
+        <div class="image-container">
+            <figure>
+                <img src="https://cdn.networkacademy.io/sites/default/files/2024-06/ospf-and-mospf.svg"
+                    alt="รูปที่ 1: เราเตอร์ที่ทำงานทั้งโปรโตคอลการจัดเส้นทาง Unicast และ Multicast" />
+                <figcaption>รูปที่ 1: เราเตอร์ที่ทำงานทั้งโปรโตคอลการจัดเส้นทาง Unicast และ Multicast</figcaption>
+            </figure>
+        </div>
+
+        <p>อย่างไรก็ตาม ต่อมาพบว่าโปรโตคอลการจัดเส้นทาง Unicast ได้ทำการคำนวณที่จำเป็นทั้งหมดไว้แล้ว
+            และไม่จำเป็นต้องมีโปรโตคอล Multicast เต็มรูปแบบที่ทำการคำนวณเดียวกันซ้ำและสิ้นเปลืองทรัพยากรของเราเตอร์</p>
+
+        <div class="image-container">
+            <figure>
+                <img src="https://cdn.networkacademy.io/sites/default/files/2024-06/ospf-and-pim.svg"
+                    alt="รูปที่ 2: เราเตอร์ที่ทำงานทั้งโปรโตคอลการจัดเส้นทาง Unicast และ PIM" />
+                <figcaption>รูปที่ 2: เราเตอร์ที่ทำงานทั้งโปรโตคอลการจัดเส้นทาง Unicast และ PIM</figcaption>
+            </figure>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Protocol Independent Multicast (PIM)</h2>
+        <p>PIM ถูกพัฒนาขึ้นโดยใช้แนวคิดว่าโปรโตคอลการจัดเส้นทาง Multicast ไม่จำเป็นต้องคำนวณโทโพโลยีเต็มรูปแบบ
+            แต่เพียงใช้ข้อมูลที่ได้จากการจัดเส้นทาง Unicast ที่มีอยู่แล้ว</p>
+
+        <div class="highlight">
+            <p>"Protocol Independent" หมายความว่าไม่ขึ้นอยู่กับโปรโตคอลการจัดเส้นทาง Unicast เฉพาะใด
+                สามารถใช้ข้อมูลที่ได้จากโปรโตคอลพื้นฐานใดๆ เช่น RIP, ISIS, EIGRP, OSPF, BGP ฯลฯ</p>
+        </div>
+
+        <p>PIM ทำงานโดยสร้างและรักษา Multicast Distribution Trees (MDT) โดยใช้ข้อมูลที่ได้จากโปรโตคอลการจัดเส้นทาง
+            Unicast ตราบใดที่ตารางการจัดเส้นทาง Unicast มีความเสถียรและไม่มีลูป</p>
+    </div>
+
+    <div class="section">
+        <h2>Multicast Distribution Tree (MDT)</h2>
+        <p>ในเครือข่าย คำว่า "tree" (ต้นไม้) ถูกใช้บ่อย
+            โปรโตคอลหลายตัวใช้แนวคิดนี้เพื่ออธิบายกราฟของเส้นทางเครือข่ายจากจุดเริ่มต้นไปยังจุดสิ้นสุด</p>
+
+        <p>โดยทั่วไป เมื่อบางสิ่งถูกอธิบายว่าเป็น "ต้นไม้" มักหมายความว่ามีลักษณะสำคัญสี่ประการดังนี้:</p>
+        <ul>
+            <li>ไม่มีลูป (Loop-free): ไม่มีวงจรหรือลูป</li>
+            <li>มีลำดับชั้น (Hierarchical): เติบโตจากรากผ่านกิ่งก้านและใบ</li>
+            <li>มีความแน่นอน (Deterministic): มีเพียงเส้นทางที่สั้นที่สุดหนึ่งเส้นจากจุด A ไปยัง B (ไม่มี ECMP)</li>
+            <li>มีทิศทาง (Directional): ขยายออกจากรากไปสู่ภายนอก</li>
+        </ul>
+
+        <p>MDT เป็นโครงสร้างต้นไม้แนวคิดที่อธิบายเส้นทางที่ข้อมูล Multicast ไหลจากแหล่งกำเนิดไปยังผู้รับ</p>
+
+        <div class="image-container">
+            <figure>
+                <img src="https://cdn.networkacademy.io/sites/default/files/2024-06/multicast-enabled-network.svg"
+                    alt="รูปที่ 4: เครือข่ายที่เปิดใช้งาน Multicast" />
+                <figcaption>รูปที่ 4: เครือข่ายที่เปิดใช้งาน Multicast</figcaption>
+            </figure>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Shortest Path Tree (SPT)</h2>
+        <p>SPT แสดงเส้นทางสั้นที่สุดจากแหล่งกำเนิดไปยังผู้รับ เป้าหมายของ PIM คือใช้ข้อมูลที่ได้จากโปรโตคอลการจัดเส้นทาง
+            Unicast และสร้าง SPT เพื่อให้ Multicast จากแหล่งกำเนิดสามารถส่งไปยังผู้รับที่สนใจได้อย่างเหมาะสม</p>
+
+        <div class="image-container">
+            <figure>
+                <img src="https://cdn.networkacademy.io/sites/default/files/2024-06/spt-receiver-1.svg"
+                    alt="รูปที่ 5: SPT ของผู้รับ 1" />
+                <figcaption>รูปที่ 5: SPT ของผู้รับ 1</figcaption>
+            </figure>
+        </div>
+
+        <p>คำว่า Shortest Path Tree และ Source Path Tree ใช้แทนกันได้ในบริบทของ PIM ทั้งสองคำหมายถึงเส้นทางที่เหมาะสม
+            แน่นอน ไม่มีลูป และสั้นที่สุดจากแหล่งกำเนิดไปยังผู้รับ</p>
+
+        <div class="image-container">
+            <figure>
+                <img src="https://cdn.networkacademy.io/sites/default/files/2024-06/spt-receiver-2.svg"
+                    alt="รูปที่ 6: SPT ของผู้รับ 2" />
+                <figcaption>รูปที่ 6: SPT ของผู้รับ 2</figcaption>
+            </figure>
+        </div>
+
+        <p>สังเกตว่าผู้รับแต่ละรายมี SPT ของตัวเอง และเส้นทาง Multicast
+            อาจแตกต่างกันตามเส้นทางที่สั้นที่สุดจากแหล่งกำเนิดไปยังผู้รับแต่ละราย</p>
+    </div>
+
+    <div class="section">
+        <h2>การรู้จักแหล่งกำเนิด (S, G) และไม่รู้จักแหล่งกำเนิด (*, G)</h2>
+        <div class="image-container">
+            <figure>
+                <img src="https://cdn.networkacademy.io/sites/default/files/2024-06/why-do-we-need-rpt.svg"
+                    alt="รูปที่ 7: ทำไมเราจึงต้องการ RPT" />
+                <figcaption>รูปที่ 7: ทำไมเราจึงต้องการ RPT</figcaption>
+            </figure>
+        </div>
+
+        <p>การส่ง IP Multicast เป็นฟังก์ชันที่ไม่มีสถานะ (Stateless) แหล่งกำเนิดเพียงส่งแพ็กเก็ตไปยังที่อยู่กลุ่ม
+            Multicast (เช่น 239.1.1.1) โดยไม่ต้องรู้จักหรือติดตามผู้รับแต่ละคน เครือข่ายรับผิดชอบในการส่งข้อมูล
+            Multicast ไปยังผู้รับที่สนใจ (หากมี)</p>
+
+        <p>การรับ Multicast เป็นฟังก์ชันที่มีสถานะ (Stateful) ผู้รับต้องเข้าร่วมกลุ่ม Multicast ที่ต้องการรับอย่างชัดเจน
+        </p>
+
+        <div class="highlight">
+            <p><strong>รู้จักแหล่งกำเนิด (S, G)</strong>: ในบางกรณี ผู้รับรู้ที่อยู่ IP ของแหล่งกำเนิดสตรีม Multicast
+                ที่ต้องการ ในกรณีนี้ เราเตอร์ Gateway ท้องถิ่นของผู้รับสามารถเริ่มสร้าง SPT ได้ทันทีเนื่องจากรู้ที่อยู่
+                IP ของแหล่งกำเนิด</p>
+
+            <p><strong>ไม่รู้จักแหล่งกำเนิด (*, G)</strong>: ในกรณีที่พบบ่อยที่สุด
+                ผู้รับไม่รู้จักแหล่งกำเนิดที่ส่งข้อมูล Multicast ที่สนใจ
+                เครือข่ายต้องติดตามว่ามีแหล่งกำเนิดที่ใช้งานอยู่หรือไม่ นี่คือเหตุผลที่เราต้องการ Rendezvous Point (RP)
+            </p>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Rendezvous Point (RP)</h2>
+        <p>RP เป็นเราเตอร์ในเครือข่ายที่ทำหน้าที่เป็นจุดศูนย์กลางที่แหล่งกำเนิด Multicast และผู้รับลงทะเบียนในตอนแรก</p>
+
+        <div class="image-container">
+            <figure>
+                <img src="https://cdn.networkacademy.io/sites/default/files/2024-06/introducing-the-randezvous-point-rp.svg"
+                    alt="รูปที่ 8: การแนะนำ Rendezvous Point (RP)" />
+                <figcaption>รูปที่ 8: การแนะนำ Rendezvous Point (RP)</figcaption>
+            </figure>
+        </div>
+
+        <p>เมื่อแหล่งกำเนิด Multicast เริ่มส่งข้อมูล Multicast มันจะส่งข้อมูลไปยัง RP โดยใช้ข้อความ PIM Register ดังนั้น
+            RP จึงรู้จักแหล่งกำเนิดที่ใช้งานทั้งหมดในเครือข่าย</p>
+
+        <p>เมื่อผู้รับต้องการเข้าร่วมกลุ่ม Multicast เราเตอร์ Gateway ท้องถิ่นจะส่งข้อความ PIM Join ไปยัง RP
+            ข้อความนี้ถามว่า RP มีแหล่งกำเนิดที่ใช้งานอยู่ที่ส่ง Multicast ไปยังกลุ่มนั้นหรือไม่</p>
+
+        <div class="image-container">
+            <figure>
+                <img src="https://cdn.networkacademy.io/sites/default/files/2024-06/multicast-flows-via-the-randezvous-point.svg"
+                    alt="รูปที่ 9: การไหลของ Multicast ผ่าน RP" />
+                <figcaption>รูปที่ 9: การไหลของ Multicast ผ่าน RP</figcaption>
+            </figure>
+        </div>
+
+        <p class="important">ต้องจำ:</p>
+        <ul>
+            <li>เราเตอร์ Gateway ท้องถิ่นของแหล่งกำเนิดเรียกว่า First Hop Router (FHR)</li>
+            <li>เราเตอร์ Gateway ท้องถิ่นของผู้รับเรียกว่า Last Hop Router (LHR)</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>Rendezvous Point Tree (RPT)</h2>
+        <p>RPT มักถูกเรียกว่า "Shared Tree" มีรากที่เราเตอร์ที่ทำหน้าที่พิเศษในโดเมน PIM เรียกว่า Rendezvous Point (RP)
+            RP จัดการข้อมูลเกี่ยวกับแหล่งกำเนิด Multicast ในเครือข่าย</p>
+
+        <div class="image-container">
+            <figure>
+                <img src="https://cdn.networkacademy.io/sites/default/files/2024-06/shared-tree-rpt.svg"
+                    alt="รูปที่ 10: Shared tree - Rendezvous Point Tree (RPT)" />
+                <figcaption>รูปที่ 10: Shared tree - Rendezvous Point Tree (RPT)</figcaption>
+            </figure>
+        </div>
+
+        <p>ในบริบทนี้ คำว่า Rendezvous Point Tree (RPT) อธิบายเส้นทางที่ไม่มีลูป แน่นอน และมีทิศทางจาก RP ไปยังผู้รับ
+        </p>
+    </div>
+
+    <div class="section">
+        <h2>กระบวนการทำงานของ PIM</h2>
+        <ol>
+            <li>เมื่อ FHR ได้รับสตรีม Multicast จากแหล่งกำเนิด มันจะลงทะเบียนแหล่งกำเนิดกับ Rendezvous Point (RP)</li>
+            <li>เมื่อ LHR (เราเตอร์ Gateway ของผู้รับ) ได้รับ Multicast จาก RP มันเรียนรู้ที่อยู่ IP ของแหล่งกำเนิด
+                จากนั้น LHR เริ่มสร้าง Shortest Path Tree (SPT) ไปยังแหล่งกำเนิด</li>
+            <li>FHR ส่งข้อมูล Multicast โดยตรงไปยัง LHR และ Rendezvous Point ไม่ได้อยู่ในเส้นทางข้อมูลอีกต่อไป</li>
+        </ol>
+    </div>
+
+    <div class="key-points">
+        <h3>สรุปสาระสำคัญ</h3>
+        <ul>
+            <li>PIM ใช้ข้อมูลที่ได้จากโปรโตคอลการจัดเส้นทาง Unicast และสามารถทำงานกับโปรโตคอลพื้นฐานใดๆ</li>
+            <li>PIM สร้าง Multicast Distribution Tree (MDT) สองประเภท: SPT และ RPT</li>
+            <li>การส่ง Multicast เป็นฟังก์ชันที่ไม่มีสถานะ (Stateless) ขณะที่การรับ Multicast เป็นฟังก์ชันที่มีสถานะ
+                (Stateful)</li>
+            <li>Rendezvous Point (RP) ทำหน้าที่เป็นจุดศูนย์กลางที่รู้จักแหล่งกำเนิด Multicast ทั้งหมด</li>
+            <li>First Hop Router (FHR) คือเราเตอร์ Gateway ท้องถิ่นของแหล่งกำเนิด</li>
+            <li>Last Hop Router (LHR) คือเราเตอร์ Gateway ท้องถิ่นของผู้รับ</li>
+        </ul>
+    </div>
+    <footer>
+        <p>Ref: https://www.networkacademy.io/ccie-enterprise/multicast/multicast-on-the-local-lan</p>
+    </footer>
+</body>
+
+</html>

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PIM Dense Mode - สรุป</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        
+        h1, h2, h3 {
+            color: #044389;
+        }
+        
+        h1 {
+            font-size: 2.2em;
+            border-bottom: 2px solid #044389;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        
+        h2 {
+            font-size: 1.8em;
+            margin-top: 30px;
+            border-left: 5px solid #0a66c2;
+            padding-left: 15px;
+        }
+        
+        h3 {
+            font-size: 1.4em;
+            margin-top: 25px;
+        }
+        
+        p {
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .highlight {
+            background-color: #e6f2ff;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #0a66c2;
+        }
+        
+        .step {
+            background-color: #f0f7ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2c7be5;
+        }
+        
+        .step-title {
+            font-weight: 600;
+            color: #0a66c2;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+        
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+            display: block;
+            margin: 20px auto;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .figure {
+            margin: 25px 0;
+            text-align: center;
+        }
+        
+        .figure-caption {
+            margin-top: 10px;
+            color: #555;
+            font-style: italic;
+            font-size: 0.9em;
+        }
+        
+        .note {
+            background-color: #fff8e6;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #ffc107;
+            margin: 20px 0;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+            color: #777;
+        }
+        .navigation-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 40px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .nav-button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>PIM Dense Mode (PIM-DM)</h1>
+        <div class="navigation-buttons">
+            <a href="1.html" class="nav-button">แนวคิด Multicast</a>
+            <a href="2.html" class="nav-button">Multicast บน Local LAN</a>
+            <a href="3.html" class="nav-button">Multicast IP to MAC mapping</a>
+            <a href="4.html" class="nav-button">IGMP</a>
+            <a href="5.html" class="nav-button">IGMP Snooping</a>
+            <a href="6.html" class="nav-button">PIM</a>
+            <a href="7.html" class="nav-button">Dense Mode</a>
+            <a href="8.html" class="nav-button">Summary Commands</a>
+        </div>
+        
+        <div class="highlight">
+            <p>PIM (Protocol Independent Multicast) เป็นโปรโตคอลที่ใช้ในการจัดการการส่งข้อมูลแบบ Multicast โดยมีโหมดการทำงานหลัก 2 โหมด คือ PIM Dense Mode (PIM-DM) และ PIM Sparse Mode (PIM-SM) บทความนี้จะอธิบายโหมดแรกคือ PIM Dense Mode</p>
+        </div>
+        
+        <div class="figure">
+            <img src="https://cdn.networkacademy.io/sites/default/files/2024-06/pim-dm-lab-topology.svg" alt="รูปที่ 1: PIM-DM Initial Topology" />
+            <div class="figure-caption">รูปที่ 1: PIM-DM Initial Topology - โทโพโลจีเริ่มต้นสำหรับการอธิบาย PIM-DM</div>
+        </div>
+        
+        <h2>PIM Dense Mode คืออะไร?</h2>
+        <p>PIM Dense Mode เป็นวิธีการส่งข้อมูล Multicast แบบ "Push Model" โดยมีแนวคิดพื้นฐานคือ "ส่งข้อมูลไปยังทุกเราเตอร์ในเครือข่าย" ก่อน แล้วค่อยตัดเส้นทางที่ไม่ต้องการทิ้งในภายหลัง PIM-DM จะมีประสิทธิภาพสูงในกรณีที่มีผู้รับ (receivers) จำนวนมากกระจายอยู่ทั่วเครือข่าย แต่ในกรณีที่มีผู้รับน้อย โหมดนี้จะไม่มีประสิทธิภาพ</p>
+        
+        <div class="figure">
+            <img src="https://cdn.networkacademy.io/sites/default/files/2024-06/pim-dm-initial-multicast-flooding.svg" alt="รูปที่ 2: PIM-DM Initial Flooding" />
+            <div class="figure-caption">รูปที่ 2: PIM-DM Initial Flooding - การส่งข้อมูลเริ่มต้นไปยังทุกเราเตอร์ในเครือข่าย</div>
+        </div>
+        
+        <div class="note">
+            <p>PIM-DM เหมาะกับเครือข่ายขนาดเล็ก เช่น LAN/Campus ที่มีผู้รับจำนวนมากกระจายตัวอยู่ในเราเตอร์จำนวนไม่มาก</p>
+        </div>
+        
+        <h2>กลไกการทำงานของ PIM-DM</h2>
+        <p>PIM Dense Mode ใช้โมเดลการส่งข้อมูลแบบ "flood-and-prune" ซึ่งประกอบด้วย 3 ขั้นตอนหลัก:</p>
+        
+        <div class="step">
+            <div class="step-title">ขั้นตอนที่ 1: การส่งข้อมูลเริ่มต้น (Initial Flooding)</div>
+            <p>เราเตอร์ทุกตัวจะส่งข้อมูล multicast ไปยังทุกอินเตอร์เฟซที่เปิดใช้งาน PIM ยกเว้นอินเตอร์เฟซที่รับข้อมูลเข้ามา การส่งข้อมูลเริ่มจากเราเตอร์ต้นทาง (First-Hop Router หรือ FHR) และกระจายไปทั่วทั้งเครือข่าย ทำให้เราเตอร์ทุกตัวได้รับข้อมูล multicast</p>
+            
+            <div class="figure">
+                <img src="https://cdn.networkacademy.io/sites/default/files/2024-06/initial-flooding.svg" alt="รูปที่ 3: ขั้นตอนที่ 1 - Initial Flooding" />
+                <div class="figure-caption">รูปที่ 3: ขั้นตอนการส่งข้อมูลเริ่มต้นจากแหล่งที่มาไปยังทุกเราเตอร์</div>
+            </div>
+            
+            <h3>กลไกป้องกันลูป Reverse Path Forwarding (RPF)</h3>
+            <p>RPF เป็นกลไกป้องกันลูปของ PIM โดยเราเตอร์แต่ละตัวจะตรวจสอบว่าข้อมูล multicast ที่ได้รับมานั้นมาจากอินเตอร์เฟซที่ดีที่สุดในการเข้าถึงแหล่งที่มาของข้อมูล (source) ตามตารางเส้นทาง unicast หรือไม่</p>
+            
+            <ul>
+                <li>ถ้าเราเตอร์ได้รับข้อมูล multicast บนอินเตอร์เฟซ RPF (อินเตอร์เฟซที่ดีที่สุดในการเข้าถึงแหล่งที่มา) เราเตอร์จะยอมรับและส่งต่อข้อมูล</li>
+                <li>ถ้าเราเตอร์ได้รับข้อมูล multicast บนอินเตอร์เฟซอื่น เราเตอร์จะละทิ้งข้อมูลนั้น</li>
+            </ul>
+            
+            <div class="figure">
+                <img src="https://cdn.networkacademy.io/sites/default/files/2024-06/rpf-interface.svg" alt="รูปที่ 4: RPF interfaces" />
+                <div class="figure-caption">รูปที่ 4: อินเตอร์เฟซ RPF (Reverse Path Forwarding) ที่ใช้ในการป้องกันลูป</div>
+            </div>
+            
+            <div class="figure">
+                <img src="https://cdn.networkacademy.io/sites/default/files/2024-06/rpf-in-the-data-plane.svg" alt="รูปที่ 5: RPF in the data plane" />
+                <div class="figure-caption">รูปที่ 5: การทำงานของ RPF ในระดับ Data Plane</div>
+            </div>
+            
+            <h3>กลไก PIM Assert</h3>
+            <p>เมื่อมีเราเตอร์หลายตัวต้องการส่งข้อมูล multicast บนเซกเมนต์เดียวกัน จะเกิดการซ้ำซ้อนของข้อมูล กลไก PIM Assert จะเลือกเราเตอร์เพียงตัวเดียวให้เป็นผู้ส่งข้อมูล (Assert Winner) เพื่อแก้ปัญหานี้</p>
+            
+            <div class="figure">
+                <img src="https://cdn.networkacademy.io/sites/default/files/2024-06/pim-assert.svg" alt="รูปที่ 6: PIM Assert Mechanism" />
+                <div class="figure-caption">รูปที่ 6: กลไก PIM Assert ที่ใช้เลือกเราเตอร์เพียงตัวเดียวให้เป็นผู้ส่งข้อมูลบนเซกเมนต์ร่วม</div>
+            </div>
+        </div>
+        
+        <div class="step">
+            <div class="step-title">ขั้นตอนที่ 2: การตัดแต่ง (Pruning)</div>
+            <p>หลังจากการส่งข้อมูลเริ่มต้นเสร็จสิ้น เราเตอร์จะเริ่มตัดแต่งการส่งข้อมูล multicast ที่ไม่จำเป็น:</p>
+            
+            <ul>
+                <li>ถ้าเราเตอร์ไม่มีผู้รับที่สนใจกลุ่ม multicast นั้น (ทั้งที่เชื่อมต่อโดยตรงหรือผ่านเราเตอร์ downstream) เราเตอร์จะส่งข้อความ PIM Prune ไปยังเราเตอร์ต้นทาง</li>
+                <li>ถ้าเราเตอร์ได้รับข้อมูล multicast บนอินเตอร์เฟซที่ไม่ใช่ RPF เราเตอร์จะส่งข้อความ PIM Prune กลับไปยังเราเตอร์ต้นทาง</li>
+            </ul>
+            
+            <div class="figure">
+                <img src="https://cdn.networkacademy.io/sites/default/files/2024-06/pim-dm-pruning.svg" alt="รูปที่ 7: PIM-DM Pruning" />
+                <div class="figure-caption">รูปที่ 7: กระบวนการ Pruning ใน PIM-DM</div>
+            </div>
+            
+            <h3>การเผยแพร่ข้อความ Prune ไปยังต้นทาง</h3>
+            <p>เมื่อเราเตอร์ได้รับข้อความ PIM Prune เราเตอร์จะหยุดการส่งข้อมูล multicast ไปยังอินเตอร์เฟซที่ส่งข้อความ Prune มา ถ้าเราเตอร์ต้นทางไม่มีผู้รับที่สนใจบนอินเตอร์เฟซอื่น ๆ มันจะส่งข้อความ Prune ต่อไปยังต้นทางถัดไป</p>
+            
+            <h3>การ Pruning บนเซกเมนต์ร่วม</h3>
+            <p>บนเซกเมนต์ร่วมที่มีเราเตอร์หลายตัว กระบวนการ pruning จะซับซ้อนขึ้น เมื่อเราเตอร์ตัวหนึ่งส่งข้อความ PIM Prune เราเตอร์ตัวอื่นที่มีผู้รับสนใจจะต้องตอบกลับด้วยข้อความ PIM Join เพื่อรักษาการรับข้อมูล multicast ไว้</p>
+            
+            <div class="figure">
+                <img src="https://cdn.networkacademy.io/sites/default/files/2024-06/pruning-on-a-shared-segment.svg" alt="รูปที่ 8: Pruning on Shared Segments" />
+                <div class="figure-caption">รูปที่ 8: การ Pruning บนเซกเมนต์ร่วม</div>
+            </div>
+            
+            <h3>การตั้งค่าเวลาหมดอายุของ Prune</h3>
+            <p>เมื่อเราเตอร์ทำการ prune อินเตอร์เฟซ มันจะเริ่มจับเวลาหมดอายุของ prune สำหรับอินเตอร์เฟซนั้น (ค่าเริ่มต้นคือ 3 นาที) เมื่อเวลาหมดอายุ เราเตอร์จะเริ่มส่งข้อมูล multicast ไปยังอินเตอร์เฟซที่ถูก prune อีกครั้ง เว้นแต่จะได้รับข้อความ Prune ใหม่ก่อนหมดเวลา</p>
+            
+            <h3>การเชื่อมต่อใหม่ (Grafting)</h3>
+            <p>ถ้าเราเตอร์ที่เคย prune ตัวเองออกจากกลุ่ม multicast ได้รับคำขอเข้าร่วมจากเราเตอร์ downstream หรือผู้รับที่เชื่อมต่อ มันจะส่งข้อความ PIM Graft ไปยังเราเตอร์ต้นทางเพื่อเชื่อมต่อกับ multicast distribution tree อีกครั้ง</p>
+        </div>
+        
+        <div class="step">
+            <div class="step-title">ขั้นตอนที่ 3: การรีเฟรชสถานะ (State Refresh)</div>
+            <p>การดำเนินการ flood-and-prune เริ่มต้นส่งผลให้เกิด multicast distribution tree ที่มีรากจากแหล่งที่มา - เรียกว่า source path tree (SPT) อย่างไรก็ตาม การทำงานของ control plane ยังไม่เสร็จสิ้น PIM Dense Mode อาศัยการรีเฟรชสถานะเป็นระยะ สถานะ prune ไม่ถาวร มีตัวจับเวลาที่เกี่ยวข้อง เป็นระยะๆ เราเตอร์จะทำการส่งข้อมูล multicast อีกครั้งเพื่อให้แน่ใจว่าผู้รับใหม่ๆ จะได้รับข้อมูล ถ้ายังไม่มีผู้รับ กระบวนการ pruning จะเริ่มใหม่อีกครั้ง</p>
+            
+            <div class="figure">
+                <img src="https://cdn.networkacademy.io/sites/default/files/2024-06/source-path-tree.svg" alt="รูปที่ 9: The Source Path Tree (SPT)" />
+                <div class="figure-caption">รูปที่ 9: Source Path Tree (SPT) ที่เกิดขึ้นหลังจากกระบวนการ flood-and-prune</div>
+            </div>
+        </div>
+        
+        <h2>สรุป</h2>
+        <p>PIM Dense Mode (PIM-DM) เป็นโหมดการทำงานของ PIM ที่ใช้วิธีการ "flood-and-prune" เพื่อส่งข้อมูล multicast จากแหล่งที่มาไปยังผู้รับที่สนใจ โดยเริ่มจากการส่งข้อมูลไปทั่วทั้งเครือข่าย แล้วตัดแต่งเส้นทางที่ไม่จำเป็นออกในภายหลัง เหมาะสำหรับเครือข่ายที่มีผู้รับจำนวนมากกระจายอยู่ทั่วทั้งเครือข่าย แต่อาจไม่มีประสิทธิภาพในเครือข่ายที่มีผู้รับน้อย</p>
+    </div>
+    
+    <div class="footer">
+        <p>Ref: https://www.networkacademy.io/ccie-enterprise/multicast/multicast-on-the-local-lan</p>
+    </div>
+</body>
+</html>
