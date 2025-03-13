@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สรุป PIM Basics - Versions, Neighbors, และ States</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Sarabun', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            background-color: #f9f9f9;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1, h2, h3 {
+            color: #1a5276;
+        }
+        
+        h1 {
+            text-align: center;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+        }
+        
+        h2 {
+            border-left: 5px solid #3498db;
+            padding-left: 15px;
+            margin-top: 30px;
+        }
+        
+        .code-block {
+            font-size: large;
+            background-color: #f5f5f5;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: monospace;
+            overflow-x: auto;
+        }
+        
+        .note {
+            background-color: #e8f4f8;
+            border-left: 4px solid #5dade2;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .important {
+            background-color: #fdedec;
+            border-left: 4px solid #e74c3c;
+            padding: 15px;
+            margin: 15px 0;
+            font-weight: 500;
+        }
+        
+        .step {
+            background-color: #f4f6f7;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        
+        .step-number {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background-color: #3498db;
+            color: white;
+            text-align: center;
+            line-height: 30px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        
+        .highlight {
+            background-color: #fff9c4;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        .navigation-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 40px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .nav-button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 สรุป PIM Basics - Versions, Neighbors, และ States</h1>
+        <div class="navigation-buttons">
+            <a href="1.html" class="nav-button">แนวคิด Multicast</a>
+            <a href="2.html" class="nav-button">Multicast บน Local LAN</a>
+            <a href="3.html" class="nav-button">Multicast IP to MAC mapping</a>
+            <a href="4.html" class="nav-button">IGMP</a>
+            <a href="5.html" class="nav-button">IGMP Snooping</a>
+            <a href="6.html" class="nav-button">PIM</a>
+            <a href="7.html" class="nav-button">Dense Mode</a>
+            <a href="8.html" class="nav-button">Summary Commands</a>
+        </div>
+        
+        <h2>🔍 ภาพรวม Multicast และ PIM</h2>
+        <p>Protocol Independent Multicast (PIM) เป็นโปรโตคอลสำหรับการส่งข้อมูลแบบ Multicast ในเครือข่าย โดยมีลักษณะสำคัญดังนี้:</p>
+        <ul>
+            <li>PIM ทำงานอิสระจาก Unicast Routing Protocol สามารถทำงานร่วมกับ EIGRP, OSPF, ISIS, BGP หรือ Static Routes ได้</li>
+            <li>PIM ใช้ข้อมูลที่ได้จาก Unicast Routing Protocol เพื่อสร้าง Multicast Distribution Tree</li>
+            <li>แม้ PIM จะถูกเรียกว่า Multicast Routing Protocol แต่จริงๆแล้วไม่ใช่ "Routing Protocol" เพราะไม่มีการส่งและรับ Routing Updates</li>
+        </ul>
+
+        <h2>⚙️ ขั้นตอนการเปิดใช้งาน Multicast ใน Cisco IOS-XE</h2>
+        
+        <div class="step">
+            <span class="step-number">1</span>
+            <strong>เปิดใช้งาน Multicast Routing (ตั้งค่าระดับอุปกรณ์)</strong>
+            <p>โดยค่าเริ่มต้น Cisco Routers จะไม่เปิดใช้งาน Multicast Forwarding ต้องเปิดใช้งานด้วยคำสั่ง:</p>
+            <div class="code-block">
+                Router# conf t<br>
+                Router(config)# ip multicast-routing<br>
+                Router(config)# end
+            </div>
+            <p>ตรวจสอบสถานะด้วยคำสั่ง:</p>
+            <div class="code-block">
+                Router# show ip multicast
+            </div>
+        </div>
+        
+        <div class="important">
+            <strong>ข้อควรจำ:</strong>
+            <ul>
+                <li>Multicast Routing ปิดใช้งานโดยค่าเริ่มต้นบนอุปกรณ์ Cisco ทั้งหมด</li>
+                <li>ต้องเปิดใช้งานด้วยคำสั่งระดับ Global Configuration</li>
+                <li>ปัญหาทั่วไปของ Multicast คือ Router ไม่ได้เปิดใช้งาน Multicast Routing</li>
+            </ul>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">2</span>
+            <strong>เปิดใช้งาน PIM (ตั้งค่าระดับ Interface)</strong>
+            <p>PIM ต้องเปิดใช้งานบนแต่ละ Interface ด้วยคำสั่ง:</p>
+            <div class="code-block">
+                Router# conf t<br>
+                Router(config)# interface ethernet0/0<br>
+                Router(config-if)# ip pim dense-mode<br>
+                Router(config-if)# end
+            </div>
+            <p>ตรวจสอบ PIM Neighbors ด้วยคำสั่ง:</p>
+            <div class="code-block">
+                Router# show ip pim neighbor
+            </div>
+            <p>ตรวจสอบ PIM Interface ด้วยคำสั่ง:</p>
+            <div class="code-block">
+                Router# show ip pim interface
+            </div>
+        </div>
+        
+        <div class="important">
+            <strong>ข้อควรจำ:</strong>
+            <ul>
+                <li>PIM ปิดใช้งานโดยค่าเริ่มต้นบนทุก Interface ของอุปกรณ์ Cisco</li>
+                <li>ต้องเปิดใช้งานด้วยคำสั่งระดับ Interface</li>
+                <li>อย่าลืมเปิดใช้งาน PIM บน Interface ที่เชื่อมต่อกับ Source</li>
+                <li>อย่าลืมเปิดใช้งาน PIM บน Interface ที่เชื่อมต่อกับ Receivers</li>
+            </ul>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">3</span>
+            <strong>ตั้งค่า IGMP Group Membership</strong>
+            <p>เพื่อให้ Receivers สามารถเข้าร่วมกลุ่ม Multicast ใช้คำสั่ง:</p>
+            <div class="code-block">
+                Receiver# conf t<br>
+                Receiver(config)# interface ethernet0/0<br>
+                Receiver(config-if)# ip igmp join-group 239.1.1.1<br>
+                Receiver(config-if)# end
+            </div>
+        </div>
+
+        <h2>🔄 PIM Modes</h2>
+        <p>PIM สามารถทำงานได้ใน 3 โหมด:</p>
+        <table>
+            <tr>
+                <th>โหมด</th>
+                <th>รายละเอียด</th>
+            </tr>
+            <tr>
+                <td>PIM Dense Mode</td>
+                <td>ใช้โมเดลแบบ Push เพื่อส่ง Multicast</td>
+            </tr>
+            <tr>
+                <td>PIM Sparse Mode</td>
+                <td>ใช้โมเดลแบบ Pull เพื่อส่ง Multicast</td>
+            </tr>
+            <tr>
+                <td>PIM Sparse-Dense Mode</td>
+                <td>ผสมของทั้ง 2 โหมด โดยแต่ละกลุ่มสามารถเลือกใช้ Dense หรือ Sparse ได้</td>
+            </tr>
+        </table>
+
+        <h2>📊 PIM Versions</h2>
+        <p>PIM มี 2 เวอร์ชั่น โดยปัจจุบันใช้ Version 2 เป็นหลัก:</p>
+        <table>
+            <tr>
+                <th>เวอร์ชั่น</th>
+                <th>รายละเอียด</th>
+            </tr>
+            <tr>
+                <td>PIMv1</td>
+                <td>
+                    <ul>
+                        <li>ใช้รูปแบบแพ็กเก็ตของ IGMP</li>
+                        <li>ถือเป็นเวอร์ชั่นเก่าที่ไม่นิยมใช้แล้ว</li>
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <td>PIMv2</td>
+                <td>
+                    <ul>
+                        <li>มีหมายเลข IP Protocol เป็นของตัวเอง (103)</li>
+                        <li>โหมดการทำงาน (Dense หรือ Sparse) เป็นคุณสมบัติของกลุ่มแทนที่จะเป็นของ Interface</li>
+                        <li>เป็นมาตรฐานในเครือข่ายปัจจุบัน</li>
+                    </ul>
+                </td>
+            </tr>
+        </table>
+
+        <h2>🔄 กระบวนการทำงานของ PIM</h2>
+        <div class="note">
+            <p><strong>PIM Hello Messages:</strong></p>
+            <ul>
+                <li>เมื่อเปิดใช้งาน PIM บน Interface, PIM จะเริ่มส่ง Hello Messages ไปยัง Link-Local Multicast Address 224.0.0.13</li>
+                <li>Hello Messages ถูกส่งทุก 30 วินาที โดยมี Hold Timer 105 วินาที (3.5 × Hello)</li>
+                <li>เมื่อ Router อื่นมี PIM-enabled Interface บนเซ็กเมนต์เดียวกัน, Router ทั้งสองจะได้ยินกันและสร้าง PIM Adjacency</li>
+            </ul>
+        </div>
+
+        <h2>📌 PIM States</h2>
+        <p>หลักการสำคัญของ Multicast:</p>
+        <ul>
+            <li>Multicast ไหลในทิศทางจาก Source ไปยัง Receiver</li>
+            <li>Multicast Distribution Tree ถูกสร้างในทิศทางจาก Receiver ไปยัง Source</li>
+            <li>การแก้ไขปัญหาควรเริ่มจากทิศทางจาก Receiver ไปยัง Source</li>
+            <li>ไม่มี ECMP (Equal-Cost Multi-Path) มีเพียง FHR (First-Hop Router) และ LHR (Last-Hop Router) เท่านั้นที่มีส่วนร่วมใน Data Plane</li>
+        </ul>
+
+        <div class="note">
+            <p><strong>ตรวจสอบ Multicast Route Table:</strong></p>
+            <div class="code-block">
+                Router# show ip mroute [group-address]
+            </div>
+            <p><strong>ตรวจสอบ Multicast Forwarding Information Base:</strong></p>
+            <div class="code-block">
+                Router# show ip mfib [group-address]
+            </div>
+        </div>
+
+        <h2>🚀 สรุปประเด็นสำคัญ</h2>
+        <div class="important">
+            <ol>
+                <li>Multicast Routing ปิดใช้งานโดยค่าเริ่มต้นบนอุปกรณ์ Cisco ทั้งหมด ต้องเปิดใช้งานด้วยตนเอง</li>
+                <li>Router จะไม่ส่งต่อ Multicast Traffic ระหว่าง Interface หาก Multicast Routing ไม่ได้เปิดใช้งาน</li>
+                <li>Router ส่งต่อ Multicast Traffic เฉพาะระหว่าง PIM-enabled Interfaces เท่านั้น</li>
+                <li>PIM เปิดใช้งานแยกตาม Interface และปิดใช้งานโดยค่าเริ่มต้น</li>
+                <li>PIMv2 เป็นมาตรฐานและค่าเริ่มต้นบนทุกอุปกรณ์ Cisco IOS-XE ในปัจจุบัน</li>
+                <li>ความแตกต่างหลักระหว่าง PIMv1 และ PIMv2 คือรูปแบบแพ็กเก็ต</li>
+            </ol>
+        </div>
+    </div>
+</body>
+</html>

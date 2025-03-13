@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IGMP Snooping</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+
+        h1 {
+            color: #0066cc;
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #0066cc;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: #0066cc;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-left: 5px solid #0066cc;
+            padding-left: 10px;
+        }
+
+        .keyword {
+            background-color: #e6f2ff;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-weight: bold;
+            color: #0066cc;
+        }
+
+        .image-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .caption {
+            text-align: center;
+            font-style: italic;
+            color: #666;
+            margin-top: 8px;
+        }
+
+        .highlights {
+            background-color: #f0f7ff;
+            border-left: 4px solid #0066cc;
+            padding: 15px;
+            border-radius: 0 5px 5px 0;
+            margin: 20px 0;
+        }
+
+        .highlights h3 {
+            margin-top: 0;
+            color: #0066cc;
+        }
+
+        ul {
+            padding-left: 25px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #0066cc;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f7ff;
+        }
+
+        .code {
+            background-color: #f5f5f5;
+            border-left: 4px solid #0066cc;
+            padding: 10px 15px;
+            font-family: monospace;
+            border-radius: 0 5px 5px 0;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        .warning {
+            background-color: #fff7e6;
+            border-left: 4px solid #ffa500;
+            padding: 15px;
+            border-radius: 0 5px 5px 0;
+            margin: 20px 0;
+        }
+
+        .tip {
+            background-color: #e6fff2;
+            border-left: 4px solid #00cc66;
+            padding: 15px;
+            border-radius: 0 5px 5px 0;
+            margin: 20px 0;
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 40px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .nav-button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            color: #666;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>IGMP Snooping</h1>
+        <div class="navigation-buttons">
+            <a href="1.html" class="nav-button">แนวคิด Multicast</a>
+            <a href="2.html" class="nav-button">Multicast บน Local LAN</a>
+            <a href="3.html" class="nav-button">Multicast IP to MAC mapping</a>
+            <a href="4.html" class="nav-button">IGMP</a>
+            <a href="5.html" class="nav-button">IGMP Snooping</a>
+            <a href="6.html" class="nav-button">PIM</a>
+            <a href="7.html" class="nav-button">Dense Mode</a>
+            <a href="8.html" class="nav-button">Summary Commands</a>
+        </div>
+
+        <div class="highlights">
+            <h3>สรุปสาระสำคัญ</h3>
+            <p>IGMP Snooping
+                คือฟีเจอร์ที่ช่วยให้สวิตช์สามารถตรวจสอบและเฝ้าสังเกตการสื่อสารระหว่างโฮสต์และเราท์เตอร์มัลติคาสต์ภายใน
+                VLAN ทำให้สามารถส่งข้อมูลมัลติคาสต์เฉพาะไปยังพอร์ตที่มีผู้รับที่สนใจเท่านั้น
+                ช่วยลดการใช้แบนด์วิดท์และเพิ่มประสิทธิภาพของเครือข่าย</p>
+        </div>
+
+        <h2>IGMP Snooping คืออะไร?</h2>
+        <p>IGMP Snooping เป็นฟีเจอร์ที่ช่วยให้สวิตช์สามารถตรวจสอบการสื่อสารระหว่างอุปกรณ์ต่างๆ ผ่านข้อความ IGMP
+            เพื่อเรียนรู้ว่าพอร์ตใดมีผู้รับที่สนใจกลุ่มมัลติคาสต์ใดบ้าง และพอร์ตใดเชื่อมต่อกับเราท์เตอร์มัลติคาสต์</p>
+
+        <h2>ทำไมต้องใช้ IGMP Snooping?</h2>
+        <p>หากไม่มี IGMP Snooping สวิตช์จะไม่ทราบว่าพอร์ตใดมีผู้รับที่สนใจกลุ่มมัลติคาสต์เฉพาะ
+            ดังนั้นจะทำการส่งข้อมูลมัลติคาสต์เหมือนกับข้อมูลบรอดคาสต์ ซึ่งจะถูกส่งไปยังทุกพอร์ตใน VLAN
+            ทำให้สิ้นเปลืองแบนด์วิดท์และอาจทำให้เกิดปัญหาด้านประสิทธิภาพในเครือข่ายขนาดใหญ่</p>
+
+        <div class="image-container">
+            <img src="https://cdn.networkacademy.io/sites/default/files/2024-06/why-do-we-need-igmp-snooping.svg"
+                alt="เครือข่าย LAN ที่ไม่มี IGMP Snooping">
+            <div class="caption">รูปที่ 1: เครือข่าย LAN ที่ไม่มี IGMP Snooping ข้อมูลมัลติคาสต์จะถูกส่งไปยังทุกพอร์ต
+            </div>
+        </div>
+
+        <h2>IGMP Snooping ทำงานอย่างไร?</h2>
+        <p>IGMP Snooping จะถูกเปิดใช้งานบนสวิตช์ตาม VLAN เมื่อเปิดใช้งานฟีเจอร์นี้ สวิตช์จะคอยฟังข้อความต่อไปนี้ภายใน
+            VLAN:</p>
+        <ul>
+            <li><span class="keyword">IGMP Membership Queries</span> - คำขอจากเราท์เตอร์มัลติคาสต์</li>
+            <li><span class="keyword">IGMP Membership Responses</span> - การตอบกลับจากโฮสต์</li>
+            <li><span class="keyword">PIM Hello messages</span> - ข้อความแจ้งสถานะจากโปรโตคอล PIM</li>
+        </ul>
+
+        <p>จากการตรวจสอบข้อความ IGMP สวิตช์จะสร้างตาราง "IGMP snooping table" ที่จัดประเภทพอร์ตเป็น 2 ประเภท:</p>
+        <ul>
+            <li><span class="keyword">multicast-router interface</span> - พอร์ตที่เชื่อมต่อไปยังเราท์เตอร์มัลติคาสต์หรือ
+                IGMP querier</li>
+            <li><span class="keyword">group-member interface</span> - พอร์ตที่เชื่อมต่อไปยังผู้รับที่สนใจ</li>
+        </ul>
+
+        <div class="warning">
+            <p><strong>สิ่งสำคัญ:</strong> จำเป็นต้องมี IGMP querier อยู่ใน VLAN (ซึ่งมักเป็นเราท์เตอร์มัลติคาสต์)
+                เพื่อให้ IGMP Snooping ทำงานได้อย่างถูกต้อง</p>
+        </div>
+
+        <h2>ขั้นตอนการทำงานของ IGMP Snooping</h2>
+
+        <h3>ขั้นตอนที่ 1: การค้นหาพอร์ตเราท์เตอร์มัลติคาสต์</h3>
+        <ul>
+            <li>IGMP querier (เราท์เตอร์ R1) ส่ง IGMP Membership Queries ไปยังที่อยู่ all-hosts link-local 224.0.0.1
+            </li>
+            <li>เมื่อสวิตช์ SW1 ได้รับ query จะเพิ่มพอร์ต 0/1 เข้าไปในตาราง IGMP snooping เป็นพอร์ต mrouter</li>
+            <li>จากนั้นจะส่งต่อ IGMP query ไปยังทุกพอร์ตเพื่อให้โฮสต์ได้รับ</li>
+            <li>SW2 จะได้รับ IGMP query บนพอร์ต 0/2 และเพิ่มเข้าไปในตารางเป็นพอร์ตเราท์เตอร์
+                จากนั้นส่งต่อข้อความไปยังทุกพอร์ต</li>
+        </ul>
+
+        <div class="image-container">
+            <img src="https://cdn.networkacademy.io/sites/default/files/2024-06/igmp-snooping-mrouter-ports.svg"
+                alt="IGMP Snooping Mrouter Ports">
+            <div class="caption">รูปที่ 2: การค้นหาพอร์ตเราท์เตอร์มัลติคาสต์ใน IGMP Snooping</div>
+        </div>
+
+        <h3>ขั้นตอนที่ 2: การค้นหาพอร์ตสมาชิก</h3>
+        <ul>
+            <li>PC1 และ PC4 ตอบกลับ IGMP Membership Query ด้วย Membership Report สำหรับกลุ่ม 239.1.1.1</li>
+            <li>SW1 ได้รับรายงานจาก PC1 บนพอร์ต 0/3 และเพิ่มพอร์ตเข้าไปในตารางเป็นสมาชิกของกลุ่ม 239.1.1.1</li>
+            <li>SW1 ส่งรายงานไปยังพอร์ตเราท์เตอร์ที่นำไปสู่เราท์เตอร์มัลติคาสต์เท่านั้น</li>
+            <li>SW2 ได้รับรายงานจาก PC4 บนพอร์ต 0/4 และทำเช่นเดียวกัน</li>
+            <li>สังเกตว่า PC2 และ PC3 จะไม่ได้รับรายงานจาก PC1 และ PC4 นี่คือการเพิ่มประสิทธิภาพแรกของ IGMP Snooping
+            </li>
+        </ul>
+
+        <div class="image-container">
+            <img src="https://cdn.networkacademy.io/sites/default/files/2024-06/igmp-snooping-member-portss.svg"
+                alt="IGMP Snooping Member Ports">
+            <div class="caption">รูปที่ 3: การค้นหาพอร์ตสมาชิกใน IGMP Snooping</div>
+        </div>
+
+        <p>ผลลัพธ์จากสองขั้นตอนนี้ ทำให้สวิตช์ทั้งสอง (SW1 และ SW2)
+            รู้ว่าพอร์ตใดเชื่อมต่อกับผู้รับที่สนใจและเราท์เตอร์มัลติคาสต์ เมื่อ R1 ส่งข้อมูลมัลติคาสต์ไปยัง LAN
+            สวิตช์จะส่งต่อข้อมูลนี้เฉพาะไปยังพอร์ต mrouter และพอร์ตสมาชิกตามตาราง IGMP snooping</p>
+
+        <div class="image-container">
+            <img src="https://cdn.networkacademy.io/sites/default/files/2024-06/igmp-snooping-efficiency.svg"
+                alt="IGMP Snooping Efficiency">
+            <div class="caption">รูปที่ 4: ประสิทธิภาพของ IGMP Snooping -
+                ข้อมูลมัลติคาสต์ถูกส่งเฉพาะไปยังพอร์ตที่ต้องการ</div>
+        </div>
+
+        <div class="tip">
+            <p>รายการในตาราง IGMP Snooping จะมีเวลาหมดอายุ หากไม่ได้รับข้อความ IGMP
+                สำหรับกลุ่มมัลติคาสต์เฉพาะภายในระยะเวลาหนึ่ง สวิตช์จะลบรายการนั้นออกจากตาราง</p>
+        </div>
+
+        <h2>การกำหนดค่า IGMP Snooping</h2>
+        <p>IGMP snooping เปิดใช้งานบนทุก VLAN โดยค่าเริ่มต้นบนสวิตช์ Cisco รุ่นใหม่ทั้งหมด
+            แต่เราสามารถกำหนดค่าและตรวจสอบฟีเจอร์นี้ได้</p>
+
+        <h3>ข้อกำหนดเบื้องต้น</h3>
+        <p>ต้องมี IGMP Querier ใน VLAN ซึ่งมักเป็นเราท์เตอร์มัลติคาสต์ในเซกเมนต์ เมื่อกำหนดค่า PIM บนอินเตอร์เฟซ IGMP
+            จะถูกเปิดใช้งานโดยอัตโนมัติ</p>
+
+        <div class="image-container">
+            <img src="https://cdn.networkacademy.io/sites/default/files/2024-06/igmp-snooping-configuration.svg"
+                alt="การกำหนดค่า IGMP Snooping">
+            <div class="caption">รูปที่ 5: การกำหนดค่า IGMP Snooping</div>
+        </div>
+
+        <h3>คำสั่งการกำหนดค่า IGMP Snooping</h3>
+
+        <div class="code">
+            SW1(config)# ip igmp snooping vlan 10 <span style="color: green;">// เปิดใช้งาน IGMP snooping บน VLAN
+                10</span><br>
+            SW1(config)# no ip igmp snooping vlan 10 <span style="color: green;">// ปิดใช้งาน IGMP snooping บน VLAN
+                10</span>
+        </div>
+
+        <h3>การกำหนดค่าพอร์ต mrouter และสมาชิกแบบคงที่</h3>
+        <p>เราสามารถกำหนดพอร์ต mrouter แบบคงที่ได้ด้วยคำสั่งต่อไปนี้:</p>
+
+        <div class="code">
+            SW1(config)# ip igmp snooping vlan 10 mrouter interface Ethernet 1/0
+        </div>
+
+        <p>เพื่อตรวจสอบพอร์ต mrouter:</p>
+
+        <div class="code">
+            SW1# sh ip igmp snooping mrouter vlan 10<br>
+            Vlan ports<br>
+            ---- -----<br>
+            10 Et0/0(dynamic), Et1/0(static)
+        </div>
+
+        <p>การกำหนดค่าอินเตอร์เฟซสมาชิกแบบคงที่:</p>
+
+        <div class="code">
+            SW1(config)# ip igmp snooping vlan 10 static 239.2.2.2 interface Et1/1
+        </div>
+
+        <h3>คำสั่งการตรวจสอบ</h3>
+        <p>ตรวจสอบว่าฟีเจอร์เปิดใช้งานอยู่:</p>
+
+        <div class="code">
+            SW1# sh ip igmp snooping vlan 10
+        </div>
+
+        <p>ตรวจสอบพอร์ต mrouter:</p>
+
+        <div class="code">
+            SW1# sh ip igmp snooping mrouter<br>
+            SW1# show ip igmp snooping querier
+        </div>
+
+        <p>ตรวจสอบพอร์ตสมาชิกและกลุ่ม:</p>
+
+        <div class="code">
+            SW1# sh ip igmp snooping groups
+        </div>
+
+        <h2>พารามิเตอร์เพิ่มเติมของ IGMP Snooping</h2>
+
+        <h3>Report Suppression</h3>
+        <p>เมื่อโฮสต์หลายเครื่องบน VLAN เดียวกันต้องการเข้าร่วมกลุ่มมัลติคาสต์เดียวกัน IGMP Snooping Report Suppression
+            ช่วยให้เฉพาะรายงานแรกเท่านั้นถูกส่งต่อไปยังเราท์เตอร์มัลติคาสต์ รายงานที่ตามมาจากโฮสต์อื่นๆ จะถูกระงับ
+            (ไม่ส่งต่อ)</p>
+
+        <div class="code">
+            SW1(config)# no ip igmp snooping report-suppression <span style="color: green;">// ปิดใช้งาน Report
+                Suppression</span>
+        </div>
+
+        <h3>IGMP Snooping Querier</h3>
+        <p>ในสถานการณ์ที่ไม่มีเราท์เตอร์มัลติคาสต์ใน VLAN เราสามารถกำหนดค่าให้สวิตช์ LAN ทำหน้าที่เป็น IGMP querier
+            สำหรับเซกเมนต์ได้</p>
+
+        <div class="image-container">
+            <img src="https://cdn.networkacademy.io/sites/default/files/2024-06/igmp-snooping-querier.svg"
+                alt="IGMP Snooping Querier">
+            <div class="caption">รูปที่ 6: IGMP Snooping Querier - สวิตช์ทำหน้าที่เป็นตัวส่ง Query</div>
+        </div>
+
+        <div class="highlights">
+            <h3>สรุปสำคัญของ IGMP Snooping</h3>
+            <ul>
+                <li><strong>จุดประสงค์:</strong> ช่วยให้สวิตช์จัดการข้อมูลมัลติคาสต์ใน LAN
+                    อย่างชาญฉลาดโดยการเรียนรู้แบบไดนามิกว่าพอร์ตใดมีผู้รับที่สนใจและส่งข้อมูลมัลติคาสต์เฉพาะไปยังพอร์ตเหล่านั้น
+                </li>
+                <li><strong>ประโยชน์:</strong> เพิ่มประสิทธิภาพเครือข่าย ลดการจราจรที่ไม่จำเป็น
+                    และปรับปรุงประสิทธิภาพโดยรวมในสภาพแวดล้อมที่มีข้อมูลมัลติคาสต์</li>
+                <li><strong>ข้อกำหนดเบื้องต้น:</strong> ต้องมี IGMP Querier ใน VLAN</li>
+                <li><strong>ประเภทของพอร์ต:</strong> multicast-router interface และ group-member interface</li>
+                <li><strong>ฟีเจอร์เพิ่มเติม:</strong> Report Suppression และ IGMP Snooping Querier</li>
+            </ul>
+        </div>
+    </div>
+    <footer>
+        <p>Ref: https://www.networkacademy.io/ccie-enterprise/multicast/multicast-on-the-local-lan</p>
+    </footer>
+</body>
+
+</html>
