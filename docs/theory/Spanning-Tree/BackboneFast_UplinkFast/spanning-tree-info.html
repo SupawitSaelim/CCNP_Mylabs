@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spanning-Tree BackboneFast และ UplinkFast</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Sarabun', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            background-color: #f5f8fc;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #1a5fb4;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+        
+        .feature-box {
+            border: 1px solid #dfe5ec;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            background-color: #fafdff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        h2 {
+            color: #1a5fb4;
+            margin-top: 0;
+            border-bottom: 2px solid #dfe5ec;
+            padding-bottom: 10px;
+            font-weight: 500;
+        }
+        
+        h3 {
+            color: #2d70c3;
+            margin-top: 20px;
+            font-weight: 500;
+        }
+        
+        ul {
+            padding-left: 25px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        .command {
+            background-color: #282c34;
+            color: #f8f9fc;
+            padding: 12px 20px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: monospace;
+            margin: 15px 0;
+        }
+        
+        .highlight {
+            font-weight: 600;
+            color: #1a5fb4;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            border: 1px solid #dfe5ec;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #e8f0f8;
+            color: #1a5fb4;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+        
+        .learn-more {
+            display: block;
+            margin: 30px auto 10px;
+            text-align: center;
+            background-color: #1a5fb4;
+            color: white;
+            text-decoration: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: background-color 0.3s;
+            width: fit-content;
+        }
+        
+        .learn-more:hover {
+            background-color: #154a8c;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #666;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Spanning-Tree BackboneFast และ UplinkFast</h1>
+        
+        <p><strong>Spanning-Tree BackboneFast</strong> และ <strong>Spanning-Tree UplinkFast</strong> เป็นคุณสมบัติที่ช่วยเร่งกระบวนการ Convergence ของ Spanning Tree Protocol (STP) เพื่อลดเวลาที่พอร์ตต้องรออยู่ในสถานะ Listening และ Learning ก่อนจะกลายเป็น Forwarding</p>
+        
+        <div class="feature-box">
+            <h2>1. Spanning-Tree UplinkFast</h2>
+            <p><strong>UplinkFast</strong> ใช้สำหรับลดเวลาในการ Convergence เมื่อเกิด <span class="highlight">Direct Link Failure</span> (เช่น สาย Uplink หลุด)</p>
+            
+            <h3>หลักการทำงาน</h3>
+            <ul>
+                <li>ปกติ ถ้าพอร์ต Root Port หลุด STP ต้องรอ 30–50 วินาทีเพื่อเปลี่ยนไปใช้พอร์ตสำรอง</li>
+                <li><strong>UplinkFast จะช่วยให้พอร์ตสำรอง (Blocking) สามารถกลายเป็น Forwarding ได้ทันทีโดยไม่ต้องรอ Listening/Learning</strong></li>
+                <li>เมื่อเกิด Direct Link Failure <strong>สวิตช์จะเปลี่ยนพอร์ตที่ไม่ใช่ Designated Port (Non-Designated Port) ให้เป็น Root Port และเข้าสู่สถานะ Forwarding ทันที</strong></li>
+                <li>สวิตช์จะส่ง <strong>dummy multicast frames</strong> ออกไปเพื่อบอกอุปกรณ์อื่นให้ลบ MAC Address เก่าที่อาจยังค้างอยู่ในตาราง</li>
+                <li><strong>ควรเปิดใช้งานบนสวิตช์ที่มี Non-Designated Ports เช่น Access Layer Switch</strong></li>
+            </ul>
+            
+            <h3>คำสั่งเปิดใช้งาน</h3>
+            <div class="command">Switch(config)# spanning-tree uplinkfast</div>
+        </div>
+        
+        <div class="feature-box">
+            <h2>2. Spanning-Tree BackboneFast</h2>
+            <p><strong>BackboneFast</strong> ใช้สำหรับลดเวลาในการ Convergence เมื่อเกิด <span class="highlight">Indirect Link Failure</span> (เช่น สวิตช์ตัวกลางล่ม)</p>
+            
+            <h3>หลักการทำงาน</h3>
+            <ul>
+                <li>ปกติ STP ต้องรอ <strong>MaxAge (20 วินาที)</strong> ก่อนจะเริ่มคำนวณใหม่เมื่อ BPDU จาก Root Bridge หายไป</li>
+                <li><strong>BackboneFast จะช่วยให้สวิตช์สามารถตรวจจับ Indirect Link Failure ได้เร็วขึ้นโดยใช้ Root Link Query (RLQ)</strong></li>
+                <li>เมื่อตรวจพบ <strong>Inferior BPDU</strong> จากสวิตช์ข้างเคียง (หมายถึง BPDU ที่ระบุว่า Root Bridge เปลี่ยนไปแล้ว แต่จริง ๆ ยังไม่เปลี่ยน)
+                    <ol>
+                        <li>สวิตช์จะส่ง <strong>RLQ Request</strong> เพื่อยืนยันว่า Root Bridge ยังมีอยู่หรือไม่</li>
+                        <li>ถ้า Root Bridge ยังอยู่จริง จะมีการส่ง <strong>RLQ Response</strong> กลับมา</li>
+                        <li>สวิตช์จะข้ามช่วง <strong>Max Age Timer</strong> และเปลี่ยนพอร์ตที่ไม่ใช่ Designated Port (Non-Designated Port) ให้เป็น Designated Port (เข้าสู่ Listening State) ทันที</li>
+                    </ol>
+                </li>
+                <li><strong>ควรเปิดใช้งานบนทุกสวิตช์ในเครือข่ายเพื่อให้ทำงานได้อย่างสมบูรณ์</strong></li>
+            </ul>
+            
+            <h3>คำสั่งเปิดใช้งาน</h3>
+            <div class="command">Switch(config)# spanning-tree backbonefast</div>
+        </div>
+        
+        <h2>สรุปความแตกต่าง</h2>
+        <table>
+            <tr>
+                <th>Feature</th>
+                <th>ใช้เมื่อเกิด</th>
+                <th>วิธีช่วยให้ Convergence เร็วขึ้น</th>
+                <th>เหมาะกับ</th>
+            </tr>
+            <tr>
+                <td><strong>UplinkFast</strong></td>
+                <td>Direct Link Failure<br>(สาย Uplink หลุด)</td>
+                <td>เปลี่ยนพอร์ตสำรอง (Non-Designated Port) ให้เป็น Root Port และเข้าสู่ Forwarding ทันที</td>
+                <td>สวิตช์ Access Layer ที่มี Non-Designated Ports</td>
+            </tr>
+            <tr>
+                <td><strong>BackboneFast</strong></td>
+                <td>Indirect Link Failure<br>(สวิตช์ตัวกลางล่ม)</td>
+                <td>ใช้ RLQ Request/Response เพื่อตรวจสอบ Root Bridge และข้าม Max Age Timer</td>
+                <td>ควรเปิดบนทุกสวิตช์ในเครือข่าย</td>
+            </tr>
+        </table>
+        
+        <a href="https://www.youtube.com/watch?v=NfsuLdTvkGg" class="learn-more" target="_blank">เรียนรู้เพิ่มเติมได้ที่นี่</a>
+        
+        <footer>
+            <p>© 2025 - Supawit Saelim</p>
+        </footer>
+    </div>
+</body>
+</html>
