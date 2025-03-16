@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loop Guard ในระบบ Spanning Tree Protocol</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #3498db;
+            position: relative;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            margin: 0;
+            font-size: 2.2em;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            margin: 10px 0 0;
+        }
+
+        .greeting {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            color: #34495e;
+            font-weight: 500;
+        }
+
+        h2 {
+            color: #2980b9;
+            border-left: 5px solid #3498db;
+            padding-left: 15px;
+            margin-top: 30px;
+        }
+
+        p {
+            margin-bottom: 15px;
+        }
+
+        .highlight {
+            font-weight: 600;
+            color: #e74c3c;
+        }
+        .learn-more {
+            display: block;
+            margin: 30px auto 10px;
+            text-align: center;
+            background-color: #1a5fb4;
+            color: white;
+            text-decoration: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: background-color 0.3s;
+            width: fit-content;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        .code-block {
+            background-color: #f4f8fb;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            font-family: monospace;
+            white-space: pre;
+            overflow-x: auto;
+            margin: 20px 0;
+            border-radius: 0 5px 5px 0;
+        }
+
+        .step {
+            background-color: #f9f9f9;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            border-left: 4px solid #2ecc71;
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background-color: #2ecc71;
+            color: white;
+            text-align: center;
+            line-height: 30px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .warning {
+            background-color: #fff8e1;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            border-left: 4px solid #f39c12;
+        }
+
+        .topo {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            opacity: 0.15;
+            z-index: 0;
+        }
+
+        .topo1 {
+            top: -50px;
+            right: -50px;
+            background: radial-gradient(circle at 75% 75%, #9b59b6 0%, transparent 50%);
+        }
+
+        .topo2 {
+            bottom: -50px;
+            left: -50px;
+            background: radial-gradient(circle at 25% 25%, #2ecc71 0%, transparent 50%);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ecf0f1;
+            color: #95a5a6;
+        }
+
+        .network-diagram {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 30px auto;
+            max-width: 600px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .topology-row {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin: 15px 0;
+        }
+
+        .switch {
+            padding: 10px 15px;
+            background-color: #3498db;
+            color: white;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+            min-width: 120px;
+        }
+
+        .switch-with-loop-guard {
+            background-color: #9b59b6;
+        }
+
+        .connection-line {
+            width: 3px;
+            height: 40px;
+            background-color: #95a5a6;
+            margin: 0 auto;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 0 15px 10px 0;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            border-radius: 3px;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .comparison-table th {
+            background-color: #3498db;
+            color: white;
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        .comparison-table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="topo topo1"></div>
+        <div class="topo topo2"></div>
+
+        <div class="header">
+            <h1>Loop Guard ในระบบ Spanning Tree Protocol</h1>
+            <p>การป้องกัน Loop ในกรณีที่พอร์ตไม่ได้รับ BPDU (Bridge Protocol Data Unit)</p>
+        </div>
+
+        <h2>Loop Guard คืออะไร?</h2>
+        <p>
+            <span class="highlight">Loop Guard</span> เป็นฟีเจอร์ของ Spanning Tree Protocol (STP) ที่ใช้ป้องกันการเกิด
+            <span class="highlight">Loop ในกรณีที่พอร์ต Root Port หรือ Blocked Port หยุดรับ BPDU</span>
+        </p>
+
+        <ul>
+            <li><span class="highlight">ถ้า Root Port หรือ Blocked Port ไม่ได้รับ BPDU</span> → พอร์ตจะเข้าสู่ <span
+                    class="highlight">Loop Inconsistent State</span> และหยุดส่งทราฟฟิก</li>
+            <li><span class="highlight">เมื่อ BPDU กลับมา</span> → พอร์ตจะกลับมาทำงานอัตโนมัติ</li>
+        </ul>
+
+        <div class="network-diagram">
+            <div class="topology-row">
+                <div></div>
+                <div class="switch">Root Bridge</div>
+                <div></div>
+            </div>
+
+            <div class="connection-line"></div>
+
+            <div class="topology-row">
+                <div class="switch">Switch A<br>Root Port</div>
+                <div></div>
+                <div class="switch">Switch B<br>Blocked Port</div>
+            </div>
+
+            <div class="topology-row">
+                <div class="connection-line"></div>
+                <div></div>
+                <div class="connection-line"></div>
+            </div>
+
+            <div class="topology-row">
+                <div class="switch switch-with-loop-guard">Switch C<br>Loop Guard</div>
+                <div class="connection-line" style="width: 100px; height: 3px; margin-top: 20px;"></div>
+                <div class="switch switch-with-loop-guard">Switch D<br>Loop Guard</div>
+            </div>
+
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #3498db;"></div>
+                    <span>Switch ปกติ</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #9b59b6;"></div>
+                    <span>Switch ที่เปิดใช้ Loop Guard</span>
+                </div>
+            </div>
+        </div>
+
+        <h2>Loop Guard ใช้กับพอร์ตไหน?</h2>
+        <p>
+            <span class="highlight">ใช้กับ Root Port และ Blocked Port เท่านั้น</span>
+        </p>
+        <ul>
+            <li><span class="highlight">Root Port</span> → ป้องกันไม่ให้กลายเป็น Designated Port ถ้าหยุดรับ BPDU</li>
+            <li><span class="highlight">Blocked Port (Alternate/Backup Port)</span> → ป้องกันไม่ให้กลายเป็น Forwarding
+                Port ถ้าหยุดรับ BPDU</li>
+        </ul>
+
+        <div class="warning">
+            <strong>คำเตือน:</strong> Loop Guard ไม่ควรเปิดใช้งานบนพอร์ตที่เป็น Designated Port
+            เนื่องจากอาจส่งผลกระทบต่อการทำงานของ STP และอาจทำให้เครือข่ายทำงานผิดพลาด
+        </div>
+
+        <h2>วิธีตั้งค่า Loop Guard</h2>
+
+        <div class="step">
+            <span class="step-number">1</span> เปิด Loop Guard บนพอร์ตที่ต้องการ
+            <div class="code-block">Switch(config)# interface &lt;interface&gt;
+                Switch(config-if)# spanning-tree guard loop</div>
+
+            <p>หรือกำหนดหลายพอร์ตพร้อมกัน</p>
+
+            <div class="code-block">Switch(config)# interface range &lt;interface1&gt;, &lt;interface2&gt;, ...
+                Switch(config-if-range)# spanning-tree guard loop</div>
+        </div>
+
+        <div class="step">
+            <span class="step-number">2</span> เปิด Loop Guard แบบ Global
+            <div class="code-block">Switch(config)# spanning-tree loopguard default</div>
+            <p>(จะเปิดใช้งาน Loop Guard ทุกพอร์ตที่เป็น Root Port หรือ Blocked Port)</p>
+        </div>
+
+        <h2>การทดสอบ Loop Guard</h2>
+
+        <div class="step">
+            <span class="step-number">1</span> ตรวจสอบว่ามี Loop Guard อยู่บนพอร์ตหรือไม่
+            <div class="code-block">Switch# show running-config | include spanning-tree guard loop</div>
+        </div>
+
+        <div class="step">
+            <span class="step-number">2</span> ปิดการส่ง BPDU บนพอร์ตฝั่งตรงข้าม เพื่อจำลองการหยุดรับ BPDU
+            <div class="code-block">OtherSwitch(config)# interface &lt;interface&gt;
+                OtherSwitch(config-if)# spanning-tree bpdufilter enable</div>
+        </div>
+
+        <div class="step">
+            <span class="step-number">3</span> ตรวจสอบว่าพอร์ตเข้าสู่ Loop Inconsistent State หรือไม่
+            <div class="code-block">Switch# show spanning-tree inconsistentports</div>
+            <p>ถ้าพอร์ตถูกบล็อค จะขึ้น <span class="highlight">Loop Inconsistent</span></p>
+        </div>
+
+        <div class="step">
+            <span class="step-number">4</span> ตรวจสอบสถานะพอร์ตที่ถูกบล็อค
+            <div class="code-block">Switch# show spanning-tree interface &lt;interface&gt;</div>
+            <p>พอร์ตที่ถูกบล็อคจะอยู่ในสถานะ <span class="highlight">BKN</span> (Broken) และขึ้น <code>LOOP_Inc</code>
+                (Loop Inconsistent)</p>
+        </div>
+
+        <h2>วิธีแก้ไขพอร์ตที่ถูกบล็อคจาก Loop Guard</h2>
+
+        <div class="step">
+            <span class="step-number">1</span> <span class="highlight">ลบ Loop Guard ออกจากพอร์ต
+                (ถ้าจำเป็นต้องเปลี่ยนการตั้งค่า)</span>
+            <div class="code-block">Switch(config)# interface &lt;interface&gt;
+                Switch(config-if)# no spanning-tree guard loop</div>
+        </div>
+
+        <div class="step">
+            <span class="step-number">2</span> <span class="highlight">ตรวจสอบว่า BPDU กลับมาหรือยัง</span>
+        </div>
+
+        <div class="step">
+            <span class="step-number">3</span> <span class="highlight">รอให้พอร์ตกลับมาทำงานอัตโนมัติ</span>
+            หรือใช้คำสั่ง <code>shutdown</code> และ <code>no shutdown</code> รีเซ็ตพอร์ต
+            <div class="code-block">Switch(config)# interface &lt;interface&gt;
+                Switch(config-if)# shutdown
+                Switch(config-if)# no shutdown</div>
+        </div>
+
+        <h2>ความแตกต่างระหว่าง Loop Guard และ UDLD</h2>
+        <p>Loop Guard และ UDLD (UniDirectional Link Detection) เป็นฟีเจอร์ที่ช่วยป้องกัน Loop ในเครือข่าย
+            แต่มีความแตกต่างกันดังนี้</p>
+
+        <table class="comparison-table">
+            <tr>
+                <th>คุณสมบัติ</th>
+                <th>Loop Guard</th>
+                <th>UDLD</th>
+            </tr>
+            <tr>
+                <td>การทำงาน</td>
+                <td>ตรวจจับเมื่อไม่ได้รับ BPDU</td>
+                <td>ตรวจจับการเชื่อมต่อแบบทางเดียว (Unidirectional)</td>
+            </tr>
+            <tr>
+                <td>โปรโตคอล</td>
+                <td>ทำงานบน STP</td>
+                <td>ทำงานเป็นโปรโตคอลแยกต่างหาก</td>
+            </tr>
+            <tr>
+                <td>การตรวจจับ</td>
+                <td>ตรวจจับเมื่อไม่มี BPDU เข้ามาที่พอร์ต</td>
+                <td>ตรวจจับว่าสัญญาณส่งไปแต่ไม่ได้รับกลับมา</td>
+            </tr>
+            <tr>
+                <td>เลเยอร์ที่ทำงาน</td>
+                <td>เลเยอร์ 2</td>
+                <td>เลเยอร์ 2</td>
+            </tr>
+            <tr>
+                <td>การฟื้นฟู</td>
+                <td>อัตโนมัติเมื่อได้รับ BPDU</td>
+                <td>ต้องรีเซ็ตด้วยคำสั่ง (err-disable recovery)</td>
+            </tr>
+        </table>
+
+        <h2>ข้อดีของ Loop Guard</h2>
+        <ul>
+            <li>ป้องกัน Loop ที่อาจเกิดขึ้นจากการไม่ได้รับ BPDU</li>
+            <li>ช่วยรักษาเสถียรภาพของเครือข่ายเมื่อเกิดปัญหา</li>
+            <li>ทำงานอัตโนมัติและฟื้นฟูอัตโนมัติเมื่อปัญหาหมดไป</li>
+            <li>สามารถใช้งานร่วมกับ Root Guard และ UDLD เพื่อเพิ่มความปลอดภัยให้กับเครือข่าย</li>
+        </ul>
+
+        <h2>ข้อจำกัดของ Loop Guard</h2>
+        <ul>
+            <li>ใช้ได้เฉพาะกับ Root Port และ Blocked Port เท่านั้น</li>
+            <li>ไม่สามารถป้องกัน Loop ที่เกิดจากการที่พอร์ตไม่ได้รับการกำหนดค่า STP</li>
+            <li>จำเป็นต้องกำหนดค่าที่เหมาะสมเพื่อให้ทำงานได้อย่างมีประสิทธิภาพ</li>
+        </ul>
+
+        <h2>การใช้งาน Loop Guard ร่วมกับ Root Guard</h2>
+        <p>Loop Guard และ Root Guard สามารถใช้งานร่วมกันเพื่อเพิ่มความปลอดภัยให้กับเครือข่าย โดยมีแนวทางดังนี้</p>
+
+        <ul>
+            <li><span class="highlight">Root Guard</span> → ใช้กับ <span class="highlight">Designated Port</span>
+                เพื่อป้องกันการเปลี่ยนเป็น Root Port</li>
+            <li><span class="highlight">Loop Guard</span> → ใช้กับ <span class="highlight">Root Port และ Blocked
+                    Port</span> เพื่อป้องกันการเกิด Loop</li>
+        </ul>
+
+        <div class="warning">
+            <strong>ข้อควรระวัง:</strong> ไม่ควรเปิดใช้งานทั้ง Root Guard และ Loop Guard บนพอร์ตเดียวกัน
+            เนื่องจากอาจทำให้เกิดความขัดแย้งในการทำงานของ STP
+        </div>
+        <a href="https://www.youtube.com/watch?v=nIye27VjkmQ" class="learn-more" target="_blank">เรียนรู้เพิ่มเติมได้ที่นี่</a>
+        <div class="footer">
+            <p>เอกสารแนะนำการใช้งาน Loop Guard สำหรับระบบเครือข่าย STP</p>
+            <p>© 2025 Supawit Saelim</p>
+        </div>
+    </div>
+</body>
+
+</html>

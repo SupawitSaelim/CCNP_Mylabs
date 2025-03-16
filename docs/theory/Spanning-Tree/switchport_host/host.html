@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>การตั้งค่า VLAN บนพอร์ตของสวิตช์</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Sarabun', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f7fa;
+        }
+        
+        h1, h2, h3 {
+            color: #0066cc;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #0066cc;
+        }
+        
+        .container {
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .command-section {
+            margin-bottom: 30px;
+        }
+        
+        .command-title {
+            background-color: #0066cc;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        
+        .command-detail {
+            padding: 10px;
+            background-color: #f0f5ff;
+            border-left: 4px solid #0066cc;
+            margin-bottom: 15px;
+        }
+        
+        .code-block {
+            background-color: #2d2d2d;
+            color: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: larger;
+            margin-bottom: 20px;
+        }
+        
+        .verification {
+            background-color: #ecf8f0;
+            border: 1px solid #00aa55;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        
+        .important {
+            font-weight: bold;
+            color: #cc0000;
+        }
+        
+        .highlight {
+            background-color: #fffde7;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-weight: 500;
+        }
+        
+        ul {
+            padding-left: 20px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        .note {
+            background-color: #fff8e1;
+            border-left: 4px solid #ffc107;
+            padding: 10px 15px;
+            margin: 15px 0;
+        }
+        
+        .summary {
+            background-color: #e8f5e9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 25px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>การตั้งค่า VLAN บนพอร์ตของสวิตช์</h1>
+        
+        <div class="command-section">
+            <h2 class="command-title">คำสั่งหลักที่ใช้</h2>
+            
+            <div class="command-detail">
+                <h3>1. <span class="highlight">switchport access vlan</span></h3>
+                <p>กำหนด VLAN ที่จะเชื่อมต่อกับพอร์ตนั้น เช่น <code>switchport access vlan 100</code> จะตั้งค่าพอร์ตให้เชื่อมต่อกับ <strong>VLAN 100</strong></p>
+            </div>
+            
+            <div class="command-detail">
+                <h3>2. <span class="highlight">switchport host</span></h3>
+                <p>เป็น macro ใน Cisco IOS ที่ทำการตั้งค่าพอร์ตในลักษณะดังนี้:</p>
+                <ul>
+                    <li>กำหนดให้พอร์ตอยู่ใน <strong>Access Mode</strong></li>
+                    <li>เปิด <strong>Spanning Tree PortFast</strong></li>
+                    <li>ปิดการใช้งาน <strong>EtherChannel</strong></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="command-section">
+            <h2 class="command-title">ขั้นตอนการตั้งค่า</h2>
+            <h3>ตั้งค่าพอร์ตใน Switch ALS1 และ ALS2</h3>
+            
+            <div class="code-block">
+                ALS1(config)# interface range fastethernet 0/1 - 5<br>
+                ALS1(config-if-range)# switchport access vlan 100<br>
+                ALS1(config-if-range)# switchport host<br>
+                ALS1(config-if-range)# end<br>
+                <br>
+                ALS2(config)# interface range fastethernet 0/1 - 5<br>
+                ALS2(config-if-range)# switchport access vlan 100<br>
+                ALS2(config-if-range)# switchport host<br>
+                ALS2(config-if-range)# end
+            </div>
+        </div>
+        
+        <div class="command-section">
+            <h2 class="command-title">การตรวจสอบการตั้งค่าพอร์ต</h2>
+            
+            <h3>1. ดูการตั้งค่าปัจจุบันของพอร์ต</h3>
+            <div class="code-block">
+                ALS1# show running-config interface fastethernet 0/1
+            </div>
+            
+            <div class="verification">
+                <p>ผลลัพธ์ที่ได้จะเป็นการแสดงว่า:</p>
+                <ul>
+                    <li><strong>VLAN</strong> ที่พอร์ตเชื่อมต่อ (ในที่นี้คือ VLAN 100)</li>
+                    <li><strong>Access Mode</strong> และ <strong>PortFast</strong> ถูกเปิดใช้งาน</li>
+                </ul>
+            </div>
+            
+            <h3>2. ตรวจสอบสถานะของพอร์ต</h3>
+            <div class="code-block">
+                ALS1# show interfaces fastethernet 0/1 switchport
+            </div>
+            
+            <div class="verification">
+                <p>ผลลัพธ์:</p>
+                <ul>
+                    <li><strong>Administrative Mode</strong>: static access</li>
+                    <li><strong>Operational Mode</strong>: static access</li>
+                    <li><strong>Access Mode VLAN</strong>: 100</li>
+                    <li><strong>Spanning-tree PortFast</strong>: enabled</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="summary">
+            <h2>สรุปคำสั่ง</h2>
+            <ul>
+                <li><code>switchport access vlan &lt;VLAN_ID&gt;</code>: กำหนด VLAN สำหรับพอร์ต</li>
+                <li><code>switchport host</code>: ตั้งค่าพอร์ตให้เป็น <strong>Access Mode</strong> เปิด <strong>PortFast</strong> และปิด <strong>EtherChannel</strong></li>
+            </ul>
+            
+            <div class="note">
+                <p>การตั้งค่าเหล่านี้จะช่วยให้พอร์ตสามารถทำงานในโหมด <strong>Access</strong> และสามารถเชื่อมต่อกับ VLAN ที่ต้องการได้ทันที โดยไม่ต้องรอเวลาในการ converging ของ Spanning Tree</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
