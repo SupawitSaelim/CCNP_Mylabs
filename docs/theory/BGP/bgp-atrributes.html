@@ -27,7 +27,7 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto;
             background: white;
             padding: 2rem;
@@ -103,11 +103,47 @@
             color: var(--primary-color);
             font-weight: bold;
         }
+        .navigation-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 40px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .nav-button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Border Gateway Protocol (BGP) และ BGP Attributes</h1>
+        <div class="navigation-buttons">
+            <a href="bgp-overview-en.html" class="nav-button">Overview</a>
+            <a href="BGP-Theory.pdf" target="_blank" class="nav-button">Theory PDF</a>
+            <a href="as-numbers.html" class="nav-button">AS-Number</a>
+            <a href="bgp-config-guide.html" class="nav-button">BGP Configuration</a>
+            <a href="bgp-atrributes.html" class="nav-button">BGP Attributes</a>
+            <a href="aggregate_as-set.html" class="nav-button">aggregate-address</a>
+            <a href="MED and AS-Path Prepend.html" class="nav-button">MED, AS-Path Prepend</a>
+            <a href="bgp-confederation-guide.html" class="nav-button">Confederation</a>
+            <a href="BGP Routing Protocol With 16 Practice Labs.pdf" target="_blank" class="nav-button">Labs</a>
+        </div>
         
         <section>
             <p>Border Gateway Protocol (BGP) คือโปรโตคอลสำหรับการแลกเปลี่ยนข้อมูลการเชื่อมต่อเครือข่ายระหว่าง AS (Autonomous System) บนอินเทอร์เน็ต BGP ช่วยให้แต่ละ AS สามารถประกาศเครือข่ายของตนเอง ทำให้สามารถรู้จักเครือข่ายของ AS อื่นๆ และทำให้มั่นใจได้ว่าจะมีการเชื่อมต่อแบบ end-to-end ทั่วทั้งเครือข่ายทั่วโลก</p>
@@ -122,6 +158,7 @@
 
         <section>
             <h2>ประเภทของ BGP Attributes</h2>
+            <img src="./bgp-attribute-types.jpeg" alt="">
             
             <div class="attribute-type">
                 <h3>1. Well-known Mandatory Attributes</h3>

@@ -17,7 +17,7 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             line-height: 1.6;
             color: var(--primary-color);
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 2rem;
             background-color: var(--background-color);
@@ -82,10 +82,47 @@
                 padding: 1rem;
             }
         }
+        .navigation-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 40px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .nav-button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+        }
+        
     </style>
 </head>
 <body>
     <h1>BGP Attributes และการกำหนดค่าต่างๆ</h1>
+    <div class="navigation-buttons">
+        <a href="bgp-overview-en.html" class="nav-button">Overview</a>
+        <a href="BGP-Theory.pdf" target="_blank" class="nav-button">Theory PDF</a>
+        <a href="as-numbers.html" class="nav-button">AS-Number</a>
+        <a href="bgp-config-guide.html" class="nav-button">BGP Configuration</a>
+        <a href="bgp-atrributes.html" class="nav-button">BGP Attributes</a>
+        <a href="aggregate_as-set.html" class="nav-button">aggregate-address</a>
+        <a href="MED and AS-Path Prepend.html" class="nav-button">MED, AS-Path Prepend</a>
+        <a href="bgp-confederation-guide.html" class="nav-button">Confederation</a>
+        <a href="BGP Routing Protocol With 16 Practice Labs.pdf" target="_blank" class="nav-button">Labs</a>
+    </div>
 
     <h2>1. Origin Code</h2>
     <p>เป็น attribute ที่บอกที่มาของ route มี 3 ประเภท:</p>

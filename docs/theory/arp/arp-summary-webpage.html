@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARP - สรุปสาระสำคัญ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --accent-color: #dbeafe;
+            --text-color: #1e293b;
+            --light-gray: #f1f5f9;
+            --dark-gray: #64748b;
+            --success-color: #15803d;
+            --warning-color: #b45309;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Sarabun', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: #f8fafc;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem 0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .header-logo h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        
+        .logo-icon {
+            font-size: 3rem;
+        }
+        
+        .header-logo p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-top: 0.5rem;
+        }
+        
+        main {
+            padding: 2rem 0;
+        }
+        
+        .section {
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+        
+        .section-header {
+            background-color: var(--accent-color);
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+        }
+        
+        .section-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+            flex-grow: 1;
+        }
+        
+        .section-icon {
+            color: var(--primary-color);
+        }
+        
+        .section-content {
+            padding: 1.5rem;
+            display: none;
+        }
+        
+        .section-content.show {
+            display: block;
+        }
+        
+        .section-content p {
+            margin-bottom: 1rem;
+        }
+        
+        ul {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .diagram {
+            background-color: var(--light-gray);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .diagram-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--secondary-color);
+        }
+        
+        .packet-format {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25rem;
+            margin-bottom: 1rem;
+            justify-content: center;
+        }
+        
+        .packet-field {
+            border: 1px solid var(--dark-gray);
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            text-align: center;
+            min-width: 120px;
+            background-color: white;
+            position: relative;
+        }
+        
+        .field-name {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .field-value {
+            font-size: 0.8rem;
+            color: var(--dark-gray);
+        }
+        
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .timeline-item {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+        
+        .timeline-number {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        
+        .timeline-content {
+            flex-grow: 1;
+            padding-top: 0.25rem;
+        }
+        
+        .toggle-icon {
+            transition: transform 0.3s ease;
+        }
+        
+        .rotate-icon {
+            transform: rotate(180deg);
+        }
+        
+        code {
+            font-family: monospace;
+            background-color: var(--light-gray);
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-size: 0.9rem;
+        }
+        
+        .note {
+            background-color: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0.25rem;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        th {
+            background-color: var(--accent-color);
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+        
+        tr:nth-child(even) {
+            background-color: var(--light-gray);
+        }
+        
+        .command {
+            font-family: monospace;
+            background-color: #1e293b;
+            color: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+            position: relative;
+        }
+        
+        .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background-color 0.2s;
+        }
+        
+        .copy-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        footer {
+            background-color: var(--light-gray);
+            padding: 2rem 0;
+            text-align: center;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .header-logo h1 {
+                font-size: 1.75rem;
+            }
+            
+            .logo-icon {
+                font-size: 2rem;
+            }
+            
+            .packet-format {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .packet-field {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="header-logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-network-wired"></i>
+                    </div>
+                    <div>
+                        <h1>ARP Protocol</h1>
+                        <p>Address Resolution Protocol - สรุปสาระสำคัญ</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <main class="container">
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="section-icon">
+                    <i class="fas fa-map"></i>
+                </div>
+                <h2>ความสัมพันธ์ระหว่าง Layer 2 และ Layer 3</h2>
+                <div class="toggle-icon">
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+            <div class="section-content">
+                <ul>
+                    <li><strong>Layer 3 (IP)</strong>: ให้การระบุตำแหน่งแบบ end-to-end จากต้นทางถึงปลายทาง ทำงานได้ทั้งกับอุปกรณ์ที่เชื่อมต่อโดยตรงและไม่โดยตรง</li>
+                    <li><strong>Layer 2 (MAC)</strong>: ให้การระบุตำแหน่งแบบ hop-to-hop ในแต่ละเซกเมนต์เครือข่าย ทำงานเฉพาะกับอุปกรณ์ที่เชื่อมต่อกันโดยตรง</li>
+                    <li><strong>ARP</strong>: เป็นสะพานเชื่อมระหว่าง Layer 2 และ Layer 3 ใช้แปลง IP Address เป็น MAC Address</li>
+                </ul>
+                
+                <div class="diagram">
+                    <div class="diagram-title">ความสัมพันธ์ระหว่าง Layer 2 และ Layer 3</div>
+                    <img src="/api/placeholder/700/300" alt="Layer 2 และ Layer 3 diagram" style="width: 100%; height: auto;">
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="section-icon">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <h2>ARP Message Format</h2>
+                <div class="toggle-icon">
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+            <div class="section-content">
+                <div class="diagram">
+                    <div class="diagram-title">ARP Packet Format</div>
+                    <div class="packet-format">
+                        <div class="packet-field">
+                            <div class="field-name">Hardware Type</div>
+                            <div class="field-value">1 = Ethernet</div>
+                        </div>
+                        <div class="packet-field">
+                            <div class="field-name">Protocol Type</div>
+                            <div class="field-value">0x0800 = IPv4</div>
+                        </div>
+                        <div class="packet-field">
+                            <div class="field-name">Hardware Address Length</div>
+                            <div class="field-value">6 bytes (MAC)</div>
+                        </div>
+                        <div class="packet-field">
+                            <div class="field-name">Protocol Address Length</div>
+                            <div class="field-value">4 bytes (IPv4)</div>
+                        </div>
+                        <div class="packet-field">
+                            <div class="field-name">Operation</div>
+                            <div class="field-value">1 = Request, 2 = Reply</div>
+                        </div>
+                        <div class="packet-field">
+                            <div class="field-name">Sender Hardware Address</div>
+                            <div class="field-value">MAC Address ของผู้ส่ง</div>
+                        </div>
+                        <div class="packet-field">
+                            <div class="field-name">Sender Protocol Address</div>
+                            <div class="field-value">IP Address ของผู้ส่ง</div>
+                        </div>
+                        <div class="packet-field">
+                            <div class="field-name">Target Hardware Address</div>
+                            <div class="field-value">MAC ผู้รับ (0s ใน Request)</div>
+                        </div>
+                        <div class="packet-field">
+                            <div class="field-name">Target Protocol Address</div>
+                            <div class="field-value">IP Address ของผู้รับ</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="note">
+                    <p><strong>หมายเหตุ:</strong> ARP messages ถูกบรรจุโดยตรงใน Ethernet frame โดยไม่มี IP header และมี EtherType เป็น 0x0806</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="section-icon">
+                    <i class="fas fa-exchange-alt"></i>
+                </div>
+                <h2>ARP Process</h2>
+                <div class="toggle-icon">
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+            <div class="section-content">
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-number">1</div>
+                        <div class="timeline-content">
+                            <p>ตรวจสอบ ARP Cache ก่อนส่งแพ็กเก็ต ถ้ามี entry อยู่แล้วจะใช้ MAC address นั้นได้เลย</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-number">2</div>
+                        <div class="timeline-content">
+                            <p>ถ้าไม่มี entry จะสร้าง 'incomplete' entry ก่อน</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-number">3</div>
+                        <div class="timeline-content">
+                            <p>ส่ง ARP Request แบบ broadcast (Destination MAC: FF-FF-FF-FF-FF-FF)</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-number">4</div>
+                        <div class="timeline-content">
+                            <p>อุปกรณ์ปลายทางที่มี IP ตรงกับ Target Protocol Address จะส่ง ARP Reply แบบ unicast ตอบกลับ</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-number">5</div>
+                        <div class="timeline-content">
+                            <p>อัพเดท ARP Cache จาก 'incomplete' เป็น complete entry พร้อมบันทึก MAC address</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="section-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h2>ARP Timeout</h2>
+                <div class="toggle-icon">
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+            <div class="section-content">
+                <ul>
+                    <li><strong>ค่า default ARP timeout</strong>: 4 ชั่วโมง (14400 วินาที) ใน Cisco IOS</li>
+                    <li><strong>Random Jitter</strong>: เพิ่ม 0-30 นาทีเพื่อป้องกัน ARP storm (การหมดอายุพร้อมกันของหลาย entries)</li>
+                    <li><strong>Incomplete entries</strong>: หมดอายุใน 1 นาที</li>
+                </ul>
+                
+                <div class="command">
+                    <span>arp timeout 14400</span>
+                    <button class="copy-btn" onclick="copyToClipboard(this)">คัดลอก</button>
+                </div>
+                
+                <p>เมื่อ entry หมดอายุ อุปกรณ์จะพยายามส่ง unicast ARP request 3 ครั้งก่อนลบ entry:</p>
+                <ol>
+                    <li>ครั้งที่ 1: เมื่อ timer หมด</li>
+                    <li>ครั้งที่ 2: หลังจากรอ 1 นาที</li>
+                    <li>ครั้งที่ 3: หลังจากรอเพิ่มอีก 1 นาที ถ้ายังไม่ได้รับตอบจะลบ entry</li>
+                </ol>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="section-icon">
+                    <i class="fas fa-broom"></i>
+                </div>
+                <h2>Clear ARP Process</h2>
+                <div class="toggle-icon">
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+            <div class="section-content">
+                <p>คำสั่ง <code>clear arp</code> ไม่ได้ลบ entries ทันที แต่จะพยายาม refresh entries ก่อน:</p>
+                
+                <ol>
+                    <li>ส่ง unicast ARP request ไปยังทุก entry</li>
+                    <li>ถ้าได้รับ reply, entry จะถูก refresh แทนที่จะถูกลบ</li>
+                    <li>ถ้าไม่ได้รับตอบหลัง 3 ครั้ง entry จะถูกลบ</li>
+                </ol>
+                
+                <div class="note">
+                    <p><strong>สำคัญ:</strong> นี่แตกต่างจากคำสั่ง <code>clear mac address-table dynamic</code> ที่จะลบ entries ทันทีโดยไม่มีการพยายาม refresh</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="section-icon">
+                    <i class="fas fa-user-secret"></i>
+                </div>
+                <h2>Proxy ARP</h2>
+                <div class="toggle-icon">
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+            <div class="section-content">
+                <p>Proxy ARP อนุญาตให้อุปกรณ์ (มักเป็น router) ตอบ ARP requests แทนอุปกรณ์อื่น</p>
+                
+                <div class="note">
+                    <p><strong>หมายเหตุ:</strong> Proxy ARP เปิดใช้งานเป็นค่า default ใน Cisco IOS ทั้งในระดับ global และระดับ interface</p>
+                </div>
+                
+                <p><strong>ใช้ในกรณี:</strong></p>
+                <ul>
+                    <li>Subnet mask ไม่ตรงกัน</li>
+                    <li>Directly connected static routes</li>
+                    <li>บางสถานการณ์ของ NAT</li>
+                </ul>
+                
+                <p><strong>คำสั่งที่เกี่ยวข้อง:</strong></p>
+                <div class="command">
+                    <span># ปิด/เปิด global
+[no] ip arp proxy disable
+
+# ปิด/เปิดบน interface
+[no] ip proxy-arp
+
+# ตรวจสอบสถานะ
+show ip interface [interface-name]</span>
+                    <button class="copy-btn" onclick="copyToClipboard(this)">คัดลอก</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="section-icon">
+                    <i class="fas fa-gift"></i>
+                </div>
+                <h2>Gratuitous ARP</h2>
+                <div class="toggle-icon">
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+            <div class="section-content">
+                <p>Gratuitous ARP เป็น ARP Reply ที่ส่งโดยไม่ได้รับ ARP Request ก่อน</p>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>คุณสมบัติ</th>
+                                <th>รายละเอียด</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Operation code</td>
+                                <td>2 (เหมือน ARP Reply)</td>
+                            </tr>
+                            <tr>
+                                <td>Source/Destination IP</td>
+                                <td>เป็น IP เดียวกัน (ของผู้ส่ง)</td>
+                            </tr>
+                            <tr>
+                                <td>Destination MAC</td>
+                                <td>Broadcast (FF-FF-FF-FF-FF-FF)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <p><strong>ใช้สำหรับ:</strong></p>
+                <ul>
+                    <li>ประกาศเมื่อ interface เปิดใช้งาน</li>
+                    <li>ประกาศการเปลี่ยนแปลง MAC address</li>
+                    <li>ใช้ระหว่าง failover ในโปรโตคอล FHRP (เช่น HSRP, VRRP)</li>
+                </ul>
+                
+                <div class="note">
+                    <p><strong>พฤติกรรมใน Cisco IOS:</strong> จะ refresh existing entry หากได้รับ gratuitous ARP แต่จะไม่สร้าง entry ใหม่</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="section-icon">
+                    <i class="fas fa-terminal"></i>
+                </div>
+                <h2>คำสั่ง ARP ใน Cisco IOS</h2>
+                <div class="toggle-icon">
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+            <div class="section-content">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>คำสั่ง</th>
+                                <th>คำอธิบาย</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>show arp</code> หรือ <code>show ip arp</code></td>
+                                <td>แสดง ARP table</td>
+                            </tr>
+                            <tr>
+                                <td><code>show ip arp &lt;ip-address&gt; detail</code></td>
+                                <td>แสดงรายละเอียดเพิ่มเติมของ entry</td>
+                            </tr>
+                            <tr>
+                                <td><code>arp &lt;ip-address&gt; &lt;mac-address&gt; arpa</code></td>
+                                <td>สร้าง static ARP entry</td>
+                            </tr>
+                            <tr>
+                                <td><code>clear arp</code></td>
+                                <td>พยายาม refresh และลบ entries ที่ไม่ตอบกลับ</td>
+                            </tr>
+                            <tr>
+                                <td><code>debug arp</code></td>
+                                <td>แสดงข้อมูล debug เกี่ยวกับ ARP process</td>
+                            </tr>
+                            <tr>
+                                <td><code>arp timeout &lt;seconds&gt;</code></td>
+                                <td>กำหนดค่า timeout บน interface</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer>
+        <div class="container">
+            <p>สรุปสาระสำคัญของ ARP (Address Resolution Protocol) - CCNP Level</p>
+        </div>
+    </footer>
+    
+    <script>
+        function toggleSection(element) {
+            const content = element.nextElementSibling;
+            const icon = element.querySelector('.toggle-icon i');
+            
+            content.classList.toggle('show');
+            icon.classList.toggle('rotate-icon');
+            
+            // Close other sections
+            if (content.classList.contains('show')) {
+                const allSections = document.querySelectorAll('.section-content');
+                const allIcons = document.querySelectorAll('.toggle-icon i');
+                
+                allSections.forEach(section => {
+                    if (section !== content && section.classList.contains('show')) {
+                        section.classList.remove('show');
+                    }
+                });
+                
+                allIcons.forEach(icn => {
+                    if (icn !== icon && icn.classList.contains('rotate-icon')) {
+                        icn.classList.remove('rotate-icon');
+                    }
+                });
+            }
+        }
+        
+        function copyToClipboard(button) {
+            const commandElement = button.previousElementSibling;
+            const textarea = document.createElement('textarea');
+            textarea.value = commandElement.textContent;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            
+            const originalText = button.textContent;
+            button.textContent = 'คัดลอกแล้ว!';
+            setTimeout(() => {
+                button.textContent = originalText;
+            }, 2000);
+        }
+        
+        // Open first section by default
+        document.addEventListener('DOMContentLoaded', () => {
+            const firstSection = document.querySelector('.section-header');
+            toggleSection(firstSection);
+        });
+    </script>
+</body>
+</html>
