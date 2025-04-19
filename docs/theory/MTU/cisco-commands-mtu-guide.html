@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>คำสั่ง MTU บนอุปกรณ์ Cisco</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Sarabun', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        header {
+            background: linear-gradient(135deg, #005f73 0%, #0a9396 100%);
+            padding: 20px;
+            color: white;
+            text-align: center;
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            font-size: 16px;
+            font-weight: 300;
+        }
+        .commands-container {
+            padding: 25px;
+            background-color: #f0f4f8;
+            border-radius: 5px;
+            margin: 20px;
+        }
+        .command-block {
+            background-color: #1e1e1e;
+            color: #f8f8f8;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 10px;
+            font-family: monospace;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+        .command {
+            color: #ffffff;
+            font-weight: bold;
+        }
+        .param {
+            color: #ff8c00;
+            font-style: italic;
+        }
+        .prompt {
+            color: #5cff9d;
+        }
+        .info-container {
+            padding: 20px;
+        }
+        h2 {
+            color: #005f73;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #0a9396;
+            padding-bottom: 5px;
+        }
+        h3 {
+            color: #0a9396;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        p, ul, ol {
+            margin-bottom: 15px;
+        }
+        ul, ol {
+            padding-left: 25px;
+        }
+        li {
+            margin-bottom: 5px;
+        }
+        .highlight {
+            background-color: #e9f5f5;
+            padding: 15px;
+            border-left: 4px solid #0a9396;
+            border-radius: 0 5px 5px 0;
+            margin: 20px 0;
+        }
+        .table-container {
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #e9f5f5;
+            color: #005f73;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .note {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        .note-title {
+            font-weight: bold;
+            color: #856404;
+            margin-bottom: 5px;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #005f73;
+            color: white;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>คำสั่ง MTU บนอุปกรณ์ Cisco</h1>
+            <div class="subtitle">การตั้งค่าและตรวจสอบ Maximum Transmission Unit</div>
+        </header>
+
+        <div class="commands-container">
+            <h3>คำสั่งตรวจสอบและกำหนดค่า MTU</h3>
+            <div class="command-block">
+                <span class="prompt">R1#</span> <span class="command">ping</span>
+            </div>
+            <div class="command-block">
+                <span class="prompt">R1#</span> <span class="command">ping</span> <span class="param">ip-address</span> [<span class="param">size bytes</span>] [<span class="param">df-bit</span>]
+            </div>
+            <div class="command-block">
+                <span class="prompt">R1(config-if)#</span> <span class="command">mtu</span> <span class="param">bytes</span>
+            </div>
+            <div class="command-block">
+                <span class="prompt">R1(config-if)#</span> <span class="command">ip mtu</span> <span class="param">bytes</span>
+            </div>
+            <div class="command-block">
+                <span class="prompt">R1(config-if)#</span> <span class="command">ipv6 mtu</span> <span class="param">bytes</span>
+            </div>
+            <div class="command-block">
+                <span class="prompt">R1#</span> <span class="command">show system mtu</span>
+            </div>
+            <div class="command-block">
+                <span class="prompt">R1(config)#</span> <span class="command">system mtu</span> <span class="param">bytes</span>
+            </div>
+            <div class="command-block">
+                <span class="prompt">R1(config)#</span> <span class="command">system mtu jumbo</span> <span class="param">bytes</span>
+            </div>
+            <div class="command-block">
+                <span class="prompt">R1(config)#</span> <span class="command">system mtu routing</span> <span class="param">bytes</span>
+            </div>
+            <div class="command-block">
+                <span class="prompt">R1#</span> <span class="command">show ip traffic interface</span> <span class="param">interface</span>
+            </div>
+        </div>
+
+        <div class="info-container">
+            <h2>สาระสำคัญเกี่ยวกับ MTU (Maximum Transmission Unit)</h2>
+            
+            <h3>นิยามและแนวคิดหลัก</h3>
+            <ul>
+                <li><strong>MTU (Maximum Transmission Unit)</strong> คือขนาดสูงสุดของ "หน่วย" (unit) ที่อุปกรณ์สามารถส่งหรือรับผ่านอินเทอร์เฟซได้ โดยทั่วไปหมายถึงขนาดของแพ็คเก็ต IP รวมส่วนหัว IP แต่ไม่รวมส่วนหัวและส่วนท้ายของเลเยอร์ 2</li>
+                <li>MTU มาตรฐานคือ 1500 ไบต์</li>
+                <li>MTU แบ่งเป็น 2 แนวคิดหลัก: Ethernet MTU และ IP MTU</li>
+            </ul>
+
+            <div class="highlight">
+                <h3>Ethernet MTU (หรือ Interface MTU)</h3>
+                <ul>
+                    <li>หมายถึงขนาดสูงสุดของเพย์โหลด (payload) ในเฟรม Ethernet</li>
+                    <li>เพย์โหลดหมายถึงทุกส่วนยกเว้นส่วนหัวและส่วนท้ายของเฟรม (รวมส่วนหัว Layer 3, Layer 4 และข้อมูล)</li>
+                    <li>ถ้าเพย์โหลดมีขนาดใหญ่กว่า MTU ที่กำหนด เฟรมจะถูกทิ้ง เนื่องจาก Layer 2 ไม่มีความสามารถในการแบ่งเฟรม (fragmentation)</li>
+                    <li>ขนาดเฟรมมาตรฐานจะอยู่ที่ 1518 ไบต์ (รวมส่วนหัวและส่วนท้าย) หรือ 1522 ไบต์เมื่อใช้ dot1q (เพราะ dot1q tag มีขนาด 4 ไบต์)</li>
+                </ul>
+            </div>
+
+            <div class="highlight">
+                <h3>IP MTU</h3>
+                <ul>
+                    <li>หมายถึงขนาดสูงสุดของแพ็คเก็ต IP ก่อนที่จะต้องมีการแบ่งแพ็คเก็ต (fragmentation)</li>
+                    <li>ค่าเริ่มต้นคือ 1500 ไบต์ เท่ากับ Ethernet MTU</li>
+                    <li>ถ้าตั้งค่า DF-bit (Don't Fragment bit) ในส่วนหัว IP แพ็คเก็ตที่มีขนาดใหญ่กว่า IP MTU จะถูกทิ้งแทนที่จะถูกแบ่ง</li>
+                    <li>ใช้ได้เฉพาะกับพอร์ต Layer 3 เท่านั้น พอร์ต Layer 2 ของสวิตช์ไม่รองรับ IP MTU</li>
+                    <li>IP MTU ไม่สามารถมีค่ามากกว่า Ethernet MTU ได้ แต่สามารถมีค่าน้อยกว่าได้</li>
+                    <li>เมื่อเพิ่ม Ethernet MTU ของอินเทอร์เฟซ IP MTU จะเพิ่มโดยอัตโนมัติให้เท่ากัน</li>
+                </ul>
+            </div>
+
+            <h3>System MTU</h3>
+            <p>ช่วยให้สามารถกำหนดค่า MTU เริ่มต้นในระดับระบบได้</p>
+            <ul>
+                <li><strong>System MTU:</strong> สำหรับอินเทอร์เฟซ 10/100 Mbps</li>
+                <li><strong>System Jumbo MTU:</strong> สำหรับอินเทอร์เฟซ 1/10 Gbps</li>
+                <li><strong>System Alternate MTU:</strong> ค่า MTU ที่สามกำหนดให้กับอินเทอร์เฟซเฉพาะ</li>
+                <li><strong>Routing MTU:</strong> สำหรับพอร์ตที่ทำหน้าที่เราท์ติง</li>
+            </ul>
+            <p>การกำหนดค่า MTU เฉพาะสำหรับอินเทอร์เฟซจะมีความสำคัญเหนือกว่าค่า System MTU</p>
+
+            <div class="table-container">
+                <h3>ขนาดเฟรมชนิดต่างๆ</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ประเภท</th>
+                            <th>ขนาด</th>
+                            <th>รายละเอียด</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Standard frames</strong></td>
+                            <td>1500 ไบต์</td>
+                            <td>เป็นขนาดมาตรฐานที่ใช้ในเครือข่ายส่วนใหญ่</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Jumbo frames</strong></td>
+                            <td>มากกว่า 1500 ไบต์ (ทั่วไป 9000-9216 ไบต์)</td>
+                            <td>ใช้ในเครือข่ายความเร็วสูง เช่น เซิร์ฟเวอร์ศูนย์ข้อมูล และเครือข่าย iSCSI</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Super Jumbo frames</strong></td>
+                            <td>มากกว่า 9216 ไบต์</td>
+                            <td>พบน้อยและอุปกรณ์ส่วนใหญ่ไม่รองรับ</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Baby giant frames</strong></td>
+                            <td>มากกว่า 1500 แต่น้อยกว่า Jumbo (ประมาณ 1600 ไบต์)</td>
+                            <td>มักใช้กับโปรโตคอลที่ต้องการ header เพิ่มเติม เช่น MPLS, Q-in-Q</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>ประโยชน์และข้อเสียของการเพิ่มค่า MTU</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ประโยชน์</th>
+                            <th>ข้อเสีย</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <ul>
+                                    <li>เพิ่มประสิทธิภาพเครือข่ายโดยเพิ่มอัตราส่วนข้อมูลต่อส่วนหัว (data-to-header ratio)</li>
+                                    <li>ลดจำนวนเฟรมที่ต้องส่งเพื่อข้อมูลปริมาณเดียวกัน</li>
+                                    <li>ลดภาระการประมวลผลของ CPU บนอุปกรณ์เครือข่าย</li>
+                                </ul>
+                            </td>
+                            <td>
+                                <ul>
+                                    <li>อาจเพิ่มความล่าช้าในเครือข่าย เนื่องจากแต่ละแพ็คเก็ตใช้เวลาส่งนานขึ้น</li>
+                                    <li>แพ็คเก็ตขนาดใหญ่มีโอกาสเสียหายมากกว่า หากมีบิตที่เสียหายแม้แต่บิตเดียว ต้องส่งแพ็คเก็ตทั้งหมดใหม่</li>
+                                    <li>ต้องกำหนดค่าตลอดทั้งเส้นทางเครือข่าย</li>
+                                </ul>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>MTU กับ GRE Tunnels</h3>
+            <ul>
+                <li>เมื่อใช้ GRE tunnels จะมีส่วนหัว GRE (4 ไบต์) และส่วนหัว IP เพิ่มเติม (20 ไบต์) รวมเป็น 24 ไบต์</li>
+                <li>ถ้าใช้ IP MTU ปกติ 1500 ไบต์ แพ็คเก็ตจะมีขนาดรวม 1524 ไบต์ ซึ่งเกินค่า MTU มาตรฐาน</li>
+                <li>ใน Cisco IOS อินเทอร์เฟซ GRE tunnel จะมี IP MTU เป็น 1476 ไบต์โดยอัตโนมัติ (1500 - 24)</li>
+                <li>Tunnel Transport MTU คือค่าที่คำนวณโดยอัตโนมัติและแสดงขนาดแพ็คเก็ต IP ภายในที่ใหญ่ที่สุดที่สามารถส่งได้โดยไม่ต้องแบ่งแพ็คเก็ต</li>
+            </ul>
+
+            <div class="highlight">
+                <h3>Path MTU Discovery (PMTUD)</h3>
+                <ul>
+                    <li>เป็นกลไกที่ช่วยให้อุปกรณ์ค้นพบค่า MTU ต่ำสุดในเส้นทางไปยังปลายทาง</li>
+                    <li>ช่วยหลีกเลี่ยงการแบ่งแพ็คเก็ต IP ซึ่งต้องใช้การประมวลผลเพิ่มเติม</li>
+                    <li>อุปกรณ์ที่เปิดใช้ PMTUD จะตั้งค่า DF-bit ในแพ็คเก็ต IP ขาออกโดยอัตโนมัติ</li>
+                    <li>หากอุปกรณ์ในเส้นทางมี MTU เล็กกว่าขนาดแพ็คเก็ต มันจะทิ้งแพ็คเก็ตและส่งข้อความ ICMP Fragmentation Needed กลับไปยังต้นทาง</li>
+                    <li>ต้นทางจะลดค่า MTU และส่งแพ็คเก็ตใหม่ จนกว่าแพ็คเก็ตจะสามารถส่งถึงปลายทางได้</li>
+                </ul>
+            </div>
+
+            <div class="note">
+                <div class="note-title">ข้อควรรู้</div>
+                <ol>
+                    <li>เมื่อเพิ่ม MTU ต้องเพิ่มทุกอินเทอร์เฟซในเส้นทางไปยังปลายทาง มิเช่นนั้นอินเทอร์เฟซที่มี MTU เล็กกว่าจะเป็นจุดคอขวดและป้องกันไม่ให้เฟรมขนาดใหญ่ส่งผ่านเครือข่าย</li>
+                    <li>แพ็คเก็ตที่ได้รับบนอินเทอร์เฟซที่มีขนาดใหญ่กว่า MTU ของอินเทอร์เฟซจะถูกนับเป็น "giants" และถูกทิ้ง</li>
+                    <li>IPv6 MTU เป็นค่าแยกจาก IP MTU และสามารถกำหนดค่าด้วยคำสั่ง IPV6 MTU</li>
+                    <li>โดยทั่วไปไม่จำเป็นต้องเปลี่ยนค่า MTU จากค่าเริ่มต้น 1500 ไบต์ นอกจากกรณีพิเศษ เช่น การใช้ GRE tunnels</li>
+                </ol>
+            </div>
+
+            <h3>ตัวอย่างการใช้งาน</h3>
+            <div class="command-block">
+                <span class="prompt">R1#</span> <span class="command">ping 192.168.1.1 size 1500 df-bit</span>
+                <br>
+                <span>Type escape sequence to abort.</span>
+                <br>
+                <span>Sending 5, 1500-byte ICMP Echos to 192.168.1.1, timeout is 2 seconds:</span>
+                <br>
+                <span>Packet sent with the DF bit set</span>
+                <br>
+                <span>!!!!!</span>
+                <br>
+                <span>Success rate is 100 percent (5/5), round-trip min/avg/max = 1/3/6 ms</span>
+            </div>
+
+            <div class="command-block">
+                <span class="prompt">R1(config-if)#</span> <span class="command">interface GigabitEthernet0/0</span>
+                <br>
+                <span class="prompt">R1(config-if)#</span> <span class="command">mtu 9000</span>
+                <br>
+                <span class="prompt">R1(config-if)#</span> <span class="command">exit</span>
+                <br>
+                <span class="prompt">R1(config)#</span> <span class="command">exit</span>
+                <br>
+                <span class="prompt">R1#</span> <span class="command">show interfaces GigabitEthernet0/0 | include MTU</span>
+                <br>
+                <span>  MTU 9000 bytes, BW 1000000 Kbit/sec, DLY 10 usec,</span>
+            </div>
+        </div>
+
+        <footer>
+            <p>เอกสารคำสั่ง Cisco และข้อมูล MTU &copy; 2025</p>
+        </footer>
+    </div>
+</body>
+</html>
