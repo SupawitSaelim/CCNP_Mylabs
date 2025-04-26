@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สถาปัตยกรรมการส่งต่อข้อมูล (Forwarding Architectures)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            font-size: 2.2em;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+        
+        h2 {
+            color: #2980b9;
+            font-size: 1.7em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #e0e0e0;
+            font-weight: 500;
+        }
+        
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+            font-weight: 400;
+        }
+        
+        ul {
+            margin-left: 20px;
+            margin-bottom: 20px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        .highlight {
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 10px 15px;
+            margin: 15px 0;
+        }
+        
+        code {
+            font-family: monospace;
+            background-color: #f1f1f1;
+            padding: 2px 4px;
+            border-radius: 3px;
+            color: #e74c3c;
+        }
+        
+        .note {
+            background-color: #e8f4f8;
+            border-left: 4px solid #3498db;
+            padding: 10px 15px;
+            margin: 15px 0;
+            font-size: 0.95em;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .command {
+            font-family: monospace;
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 8px 12px;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>สถาปัตยกรรมการส่งต่อข้อมูล (Forwarding Architectures)</h1>
+        
+        <div class="section">
+            <p>การสวิตช์แพ็กเก็ต IP (หรือการส่งต่อแพ็กเก็ต IP) คือกระบวนการรับแพ็กเก็ต IP เข้ามาทางอินเทอร์เฟซขาเข้า แล้วตัดสินใจว่าจะส่งต่อแพ็กเก็ตนั้นไปยังอินเทอร์เฟซขาออก หรือจะทิ้งแพ็กเก็ตนั้นไป</p>
+            <p>Cisco ได้พัฒนาการสวิตช์แบบเร็ว (Fast Switching) และ Cisco Express Forwarding (CEF) เพื่อเพิ่มประสิทธิภาพกระบวนการสวิตช์บนเราเตอร์ ทำให้สามารถรองรับปริมาณแพ็กเก็ตจำนวนมากได้</p>
+        </div>
+        
+        <div class="section">
+            <h2>การสวิตช์แบบประมวลผล (Process Switching)</h2>
+            
+            <p>Process Switching หรือที่เรียกอีกอย่างว่า Software Switching หรือ Slow Path เป็นกลไกการสวิตช์ที่ใช้ CPU ทั่วไปบนเราเตอร์ในการควบคุมการสวิตช์แพ็กเก็ต แพ็กเก็ตที่ต้องใช้การประมวลผลแบบซอฟต์แวร์ ได้แก่ แพ็กเก็ตที่มาจากหรือส่งไปยังเราเตอร์เอง (เช่น traffic ควบคุม หรือโปรโตคอล routing), แพ็กเก็ตที่ซับซ้อนเกินกว่าฮาร์ดแวร์จะจัดการได้ (เช่น IP ที่มี IP options) และแพ็กเก็ตที่ต้องการข้อมูลเพิ่มเติมที่ยังไม่ทราบ (เช่น ARP)</p>
+            
+            <div class="note">
+                <p>การสวิตช์ด้วยซอฟต์แวร์นั้นช้ากว่าการสวิตช์ด้วยฮาร์ดแวร์อย่างมาก กระบวนการ NetIO ถูกออกแบบมาให้รองรับปริมาณการจราจรเพียงส่วนน้อยของระบบ และเมื่อเป็นไปได้ แพ็กเก็ตจะถูกสวิตช์ผ่านฮาร์ดแวร์เสมอ</p>
+            </div>
+            <img src="./processing.png" alt="" width="100%">
+            
+            <p>ตาราง Routing หรือ Routing Information Base (RIB) ถูกสร้างขึ้นจากข้อมูลที่ได้จากโปรโตคอล Routing แบบไดนามิก รวมถึงเส้นทางที่เชื่อมต่อโดยตรงและ Static Routes ส่วนตาราง ARP ได้มาจากข้อมูลของโปรโตคอล ARP</p>
+        </div>
+        
+        <div class="section">
+            <h2>Cisco Express Forwarding (CEF) และ TCAM</h2>
+            
+            <p>CEF เป็นกลไกการสวิตช์แบบเฉพาะของ Cisco ซึ่งเป็นกลไกเริ่มต้นที่ใช้ในอุปกรณ์ Cisco เกือบทั้งหมดที่มี ASICs (Application-Specific Integrated Circuits) และ NPUs (Network Processing Units) เพื่อประมวลผลแพ็กเก็ตด้วยความเร็วสูง TCAM (Ternary Content Addressable Memory) ของสวิตช์ ช่วยให้สามารถตรวจจับและประเมินค่าหลายๆ ฟิลด์ของแพ็กเก็ตได้พร้อมกัน โดยข้อมูลใน TCAM จะเก็บในรูปแบบ Value, Mask และ Result ซึ่ง Value จะบอกว่าต้องค้นหาฟิลด์อะไร Mask จะบอกว่าฟิลด์ใดที่ต้องสนใจ และ Result จะบอกว่าหากแมตช์กันแล้วควรทำอย่างไร</p>
+            
+            <div class="highlight">
+                <p>TCAM ทำงานในระดับฮาร์ดแวร์ จึงมีประสิทธิภาพและรองรับการขยายตัวได้ดีกว่าการสวิตช์ผ่านกระบวนการ</p>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>สถาปัตยกรรมการส่งต่อแบบศูนย์กลาง (Centralized) และแบบกระจาย (Distributed)</h2>
+            
+            <p>ถ้า Route Processor (RP) มีหน่วยส่งต่อข้อมูล (Forwarding Engine) และตัดสินใจเรื่องการสวิตช์แพ็กเก็ตทั้งหมดเอง เราเรียกว่าสถาปัตยกรรมการส่งต่อแบบศูนย์กลาง (Centralized Forwarding Architecture) เมื่อมีแพ็กเก็ตเข้ามาทาง Line Card แรก แพ็กเก็ตจะถูกส่งไปที่ RP เพื่อทำการตรวจสอบหัวแพ็กเก็ตและกำหนดเส้นทางส่งต่อ จากนั้นแพ็กเก็ตจะถูกส่งต่อไปยัง Line Card ปลายทาง</p>
+            
+            <p>แต่ถ้า Line Cards มีหน่วยส่งต่อข้อมูลเป็นของตัวเอง สามารถตัดสินใจการสวิตช์แพ็กเก็ตได้โดยไม่ต้องส่งผ่าน RP เราเรียกว่าสถาปัตยกรรมการส่งต่อแบบกระจาย (Distributed Forwarding Architecture)</p>
+            
+            <div class="note">
+                <p>ในแบบกระจาย เมื่อแพ็กเก็ตเข้ามายัง Line Card ใด Line Card นั้นจะทำการ lookup และส่งออกไปยังอินเทอร์เฟซที่เหมาะสมทันที ถ้าอินเทอร์เฟซปลายทางอยู่บน Line Card อื่น ก็จะส่งแพ็กเก็ตผ่าน Switch Fabric (Backplane) โดยตรง ข้าม RP ไปเลย</p>
+            </div>
+            <img src="./Centralized_and_Distributed.png" alt="" width="100%">
+        </div>
+        
+        <div class="section">
+            <h2>Software CEF</h2>
+            
+            <p>Software CEF หรือซอฟต์แวร์ฐานข้อมูลการส่งต่อ (Software Forwarding Information Base) ประกอบด้วย 2 ส่วนหลัก คือ</p>
+            <ul>
+                <li><strong>Forwarding Information Base (FIB):</strong> สร้างจาก Routing Table โดยตรง มีข้อมูล Next-Hop IP Address สำหรับแต่ละปลายทางในเครือข่าย หาก Routing Table มีการเปลี่ยนแปลง FIB ก็จะถูกอัปเดตตาม</li>
+                <li><strong>Adjacency Table (AIB):</strong> เก็บข้อมูล Next-Hop MAC Address ที่สอดคล้องกับ Next-Hop IP รวมถึง MAC Address ของอินเทอร์เฟซขาออก โดยดึงข้อมูลจาก ARP Table หรือโปรโตคอล Layer 2 อื่นๆ</li>
+            </ul>
+            
+            <p>เมื่อเราเตอร์รับแพ็กเก็ต IP จะตรวจสอบ FIB หากไม่มีข้อมูล จะถือเป็น "Glean" และส่งแพ็กเก็ตไปยัง CPU เพื่อดำเนินการต่อ หากมีข้อมูล ก็จะตรวจสอบ Adjacency Table หากไม่มีข้อมูล Adjacency จะทำการ ARP เพื่อสร้างรายการใหม่สำหรับ CEF</p>
+        </div>
+        
+        <div class="section">
+            <h2>Hardware CEF</h2>
+            
+            <p>ASICs สามารถสวิตช์แพ็กเก็ตได้ในอัตราที่สูงมาก แต่มีความยืดหยุ่นต่ำเพราะถูกออกแบบมาเฉพาะงาน ในขณะที่ NPUs สามารถโปรแกรมได้ (อัปเดต Firmware ได้ง่าย) ในแพลตฟอร์มที่เป็น Distributed Architecture จะใช้ dCEF (Distributed CEF) ซึ่งเป็นการดาวน์โหลดข้อมูล CEF ไปยัง ASICs และ CPUs บน Line Cards ทุกใบ ทำให้สามารถสวิตช์แพ็กเก็ตได้ในระดับ Distributed ส่งผลให้ปริมาณการส่งต่อแพ็กเก็ตเพิ่มขึ้นอย่างมาก</p>
+        </div>
+        
+        <div class="section">
+            <h2>Stateful Switchover (SSO)</h2>
+            
+            <p>Route Processor (RP) มีหน้าที่เรียนรู้ท็อปโลยีเครือข่ายและสร้าง Routing Table หาก RP ล้มเหลว จะทำให้ Routing Protocol Reset และเกิดการสูญเสียแพ็กเก็ต</p>
+            
+            <div class="highlight">
+                <p>SSO เป็นฟีเจอร์ที่ทำให้เราเตอร์ที่มี RP สองตัวสามารถซิงโครไนซ์ข้อมูลการตั้งค่าและสถานะของ Control Plane ได้ผ่านกระบวนการที่เรียกว่า Checkpointing หาก RP หลักล้มเหลว RP สำรองจะสลับมาแทนที่ทันทีโดยไม่กระทบการส่งต่อแพ็กเก็ต</p>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>SDM Templates</h2>
+            
+            <p>จำนวน MAC Address และเส้นทางที่สวิตช์ต้องเก็บขึ้นอยู่กับตำแหน่งที่สวิตช์ถูกนำไปใช้ในเครือข่าย หน่วยความจำของตาราง TCAM ถูกกำหนดแบบคงที่ตั้งแต่การบูตเครื่อง หากหน่วยความจำเต็ม จะทำให้การประมวลผลถูกส่งไปยัง CPU ซึ่งส่งผลต่อประสิทธิภาพของสวิตช์</p>
+            
+            <p>สัดส่วนของการจัดสรรหน่วยความจำ TCAM ถูกเก็บในรูปแบบ Switching Database Manager (SDM) Templates สามารถกำหนดค่า SDM Template บนอุปกรณ์ Catalyst 9000 ได้ด้วยคำสั่ง</p>
+            
+            <div class="command">sdm prefer {vlan | advanced}</div>
+            
+            <p>และต้องทำการรีโหลดอุปกรณ์ด้วยคำสั่ง</p>
+            
+            <div class="command">reload</div>
+            
+            <p>เพื่อให้ค่ามีผล</p>
+            
+            <p>สามารถตรวจสอบ SDM Template ปัจจุบันได้ด้วยคำสั่ง</p>
+            
+            <div class="command">show sdm prefer</div>
+        </div>
+    </div>
+</body>
+</html>
