@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>บทความเชิงเทคนิค: MPLS (Multiprotocol Label Switching)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --accent-color: #3b82f6;
+            --background-color: #f8fafc;
+            --text-color: #1e293b;
+            --light-gray: #e2e8f0;
+            --dark-gray: #64748b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            font-weight: 300;
+            max-width: 800px;
+        }
+
+        main {
+            padding: 2rem 0;
+        }
+
+        section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        h2 {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--light-gray);
+        }
+
+        h3 {
+            color: var(--secondary-color);
+            font-size: 1.4rem;
+            margin: 1.5rem 0 1rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul,
+        ol {
+            margin-left: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        strong {
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        .highlight {
+            background-color: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .diagram {
+            background-color: #f8fafc;
+            border: 1px solid var(--light-gray);
+            border-radius: 6px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        th,
+        td {
+            border: 1px solid var(--light-gray);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            font-weight: 600;
+        }
+
+        code {
+            font-family: monospace;
+            background-color: #f1f5f9;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        pre {
+            background-color: #1e293b;
+            color: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+
+        .example {
+            background-color: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 6px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .note {
+            background-color: #ecfdf5;
+            border-left: 4px solid #10b981;
+            padding: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .warning {
+            background-color: #fef2f2;
+            border-left: 4px solid #ef4444;
+            padding: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .card {
+            flex: 1;
+            min-width: 250px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            border-top: 4px solid var(--accent-color);
+        }
+
+        .card h3 {
+            margin-top: 0;
+        }
+
+        footer {
+            background-color: #1e293b;
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+            margin: 1rem 0;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            h3 {
+                font-size: 1.2rem;
+            }
+
+            .card-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <h1>🛠️ บทความเชิงเทคนิค: MPLS (Multiprotocol Label Switching)</h1>
+                <p class="subtitle">เทคโนโลยีการส่งข้อมูลที่เพิ่มประสิทธิภาพในการทำงานของเครือข่าย</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section id="introduction">
+            <h2>1. บทนำ (Introduction)</h2>
+            <p>
+                MPLS (Multiprotocol Label Switching) คือเทคโนโลยีการส่งข้อมูลที่ทำงานอยู่ <strong>ระหว่าง Layer 2 และ
+                    Layer 3</strong> (มักเรียกว่า "Layer 2.5") ของ OSI Model เป็นเทคโนโลยีที่พัฒนาโดย IETF (Internet
+                Engineering Task Force) เพื่อแก้ไขข้อจำกัดของการ Routing แบบเดิม
+            </p>
+
+            <div class="highlight">
+                <p><strong>วัตถุประสงค์หลักของ MPLS:</strong></p>
+                <ul>
+                    <li>เพิ่มความเร็วในการส่งข้อมูล โดยลดเวลาในการประมวลผล Routing Decision</li>
+                    <li>สนับสนุน Traffic Engineering (TE) และ VPN ได้อย่างมีประสิทธิภาพ</li>
+                    <li>ลดภาระการประมวลผลที่ Router ด้วยการใช้ Label แทนการวิเคราะห์ IP Header ทั้งหมด</li>
+                    <li>รองรับการทำ QoS (Quality of Service) อย่างมีประสิทธิภาพ</li>
+                    <li>สร้างความยืดหยุ่นในการออกแบบเครือข่าย</li>
+                </ul>
+            </div>
+
+            <p>
+                ในปัจจุบัน MPLS ถูกใช้งานอย่างแพร่หลายในเครือข่ายของผู้ให้บริการอินเทอร์เน็ต (ISP)
+                และองค์กรขนาดใหญ่ที่ต้องการความเสถียร ความปลอดภัย และความสามารถในการจัดการ Traffic ภายในเครือข่าย
+            </p>
+        </section>
+
+        <section id="basic-concept">
+            <h2>2. หลักการทำงานเบื้องต้น (Basic Concept)</h2>
+
+            <h3>2.1 การแท็กแพ็กเก็ต (Labeling)</h3>
+            <p>
+                แทนที่การส่งต่อข้อมูลด้วยการอ่าน IP Header ทั้งหมด, MPLS จะ <strong>เพิ่ม Label Stack</strong>
+                ไว้ข้างหน้า Packet แล้ว Router อ่าน Label เพื่อ Forward Packet อย่างรวดเร็ว
+            </p>
+
+            <div class="diagram">
+                <img src="./label_format.png" alt="MPLS Packet Labeling Diagram">
+                <p><em>ภาพแสดงการทำงานของ MPLS ในการติด Label บนแพ็กเก็ต</em></p>
+            </div>
+
+            <p>
+                การใช้ Label ช่วยให้ Router ไม่จำเป็นต้องทำ IP Lookup ที่ซับซ้อนทุกครั้ง แต่สามารถใช้ Label
+                ในการตัดสินใจเลือกเส้นทางได้ทันที ทำให้การส่งข้อมูลเร็วขึ้น
+            </p>
+
+            <h3>2.2 อุปกรณ์สำคัญ</h3>
+            <div class="card-container">
+                <div class="card">
+                    <h3>LER (Label Edge Router)</h3>
+                    <p>Router ที่ทำงานที่ขอบเขตของ MPLS Domain มีหน้าที่หลักคือ:</p>
+                    <ul>
+                        <li><strong>Ingress LER:</strong> ใส่ Label ให้แพ็กเก็ตที่เข้าสู่เครือข่าย MPLS</li>
+                        <li><strong>Egress LER:</strong> ถอด Label ออกเมื่อแพ็กเก็ตจะออกจากเครือข่าย MPLS</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>LSR (Label Switch Router)</h3>
+                    <p>Router ที่อยู่ภายใน MPLS Network ที่ทำหน้าที่ <strong>Swap Label</strong> (เปลี่ยน Label)</p>
+                    <p>LSR จะอ่าน Incoming Label จากนั้นจะเปลี่ยนเป็น Outgoing Label และส่งต่อไปยัง Router ถัดไปตาม
+                        Label Forwarding Table</p>
+                </div>
+            </div>
+
+            <div class="note">
+                <p><strong>ข้อควรรู้:</strong> ในทางปฏิบัติ อุปกรณ์ Router แต่ละตัวสามารถทำหน้าที่ได้ทั้ง LER และ LSR
+                    ขึ้นอยู่กับตำแหน่งในเครือข่ายและการกำหนดค่า</p>
+            </div>
+        </section>
+
+        <section id="packet-format">
+            <h2>3. รูปแบบแพ็กเก็ต (MPLS Packet Format)</h2>
+
+            <h3>3.1 MPLS Label Header (ขนาด 32 bits)</h3>
+            <p>
+                MPLS Header มีขนาด 32 bits (4 bytes) แทรกอยู่ระหว่าง Layer 2 Header และ Layer 3 Header
+                ประกอบด้วยฟิลด์ต่างๆ ดังนี้:
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>ขนาด</th>
+                        <th>อธิบาย</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Label</td>
+                        <td>20 bits</td>
+                        <td>หมายเลข Label ที่ใช้สำหรับ Forwarding</td>
+                    </tr>
+                    <tr>
+                        <td>Exp (Experimental)</td>
+                        <td>3 bits</td>
+                        <td>ใช้สำหรับ QoS (เช่น DiffServ)</td>
+                    </tr>
+                    <tr>
+                        <td>S (Bottom of Stack)</td>
+                        <td>1 bit</td>
+                        <td>ระบุว่าเป็น Label สุดท้ายหรือไม่ (1 = Label สุดท้าย)</td>
+                    </tr>
+                    <tr>
+                        <td>TTL (Time To Live)</td>
+                        <td>8 bits</td>
+                        <td>ป้องกัน Loop เช่นเดียวกับ IP TTL</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="example">
+                <p><strong>ตัวอย่าง MPLS Header:</strong></p>
+                <pre>
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                Label                  |Exp|S|      TTL        |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+</pre>
+                <p>เช่น Label = 104857, Exp = 0, S = 1, TTL = 255</p>
+            </div>
+
+            <h3>3.2 MPLS Stack</h3>
+            <p>
+                MPLS สามารถมี <strong>หลาย Label ซ้อนกันได้</strong> (Label Stack) เช่นในกรณีของ VPN หรือ TE
+            </p>
+            <ul>
+                <li><strong>Outer Label:</strong> สำหรับการ Forwarding ใน Core Network</li>
+                <li><strong>Inner Label:</strong> ใช้บอก VPN หรือ Service ที่จะถึง</li>
+            </ul>
+
+            <div class="diagram">
+                <img src="./label_stack.png" alt="MPLS Label Stack">
+                <p><em>ภาพแสดงโครงสร้างของ MPLS Label Stack</em></p>
+            </div>
+        </section>
+
+        <section id="operation">
+            <h2>4. การทำงานเชิงลึก (MPLS Label Switching)</h2>
+
+            <h3>4.1 การตั้ง Label (Label Distribution)</h3>
+            <p>
+                ก่อนที่ MPLS จะส่งข้อมูลได้ จำเป็นต้องมีการแจกจ่าย Label ระหว่าง Router โดยมีโปรโตคอลที่ใช้ดังนี้:
+            </p>
+            <ul>
+                <li><strong>LDP (Label Distribution Protocol):</strong> แจก Label แบบอัตโนมัติตาม IP Routing Table</li>
+                <li><strong>RSVP-TE (Resource Reservation Protocol - Traffic Engineering Extension):</strong>
+                    สำหรับการทำ Traffic Engineering โดยกำหนดเส้นทางเฉพาะ</li>
+                <li><strong>BGP:</strong> แจก Label สำหรับ MPLS VPN (Layer 3 VPN)</li>
+            </ul>
+
+            <div class="highlight">
+                <p><strong>การแจก Label มี 2 วิธี:</strong></p>
+                <ul>
+                    <li><strong>Downstream Unsolicited:</strong> ส่ง Label ไปก่อน แม้ไม่มีใครขอ</li>
+                    <li><strong>Downstream on Demand:</strong> ส่ง Label เมื่อถูกร้องขอ</li>
+                </ul>
+            </div>
+
+            <h3>4.2 MPLS Data Plane Operation</h3>
+            <ol>
+                <li><strong>Ingress LER</strong> รับแพ็กเก็ตจากลูกข่าย → ใส่ Label (Push)</li>
+                <li><strong>LSR</strong> อ่าน Label → สลับ (Swap) → ส่งต่อ</li>
+                <li><strong>Egress LER</strong> ถอด (Pop) Label → ส่งแพ็กเก็ตแบบปกติ (IP)</li>
+            </ol>
+
+            <div class="diagram">
+                <img src="./forwarding.png" alt="MPLS Forwarding Process">
+                <p><em>ภาพแสดงกระบวนการส่งข้อมูลผ่านเครือข่าย MPLS</em></p>
+            </div>
+
+            <h3>4.3 ตัวอย่างการทำงาน</h3>
+            <div class="example">
+                <ol>
+                    <li>IP Packet มาถึง Ingress Router</li>
+                    <li>Ingress ใส่ MPLS Label 102</li>
+                    <li>Packet ส่งไป LSR-1 → LSR-1 เปลี่ยน Label เป็น 203</li>
+                    <li>LSR-2 เปลี่ยน Label เป็น 304</li>
+                    <li>ถึง Egress → ถอด Label → ส่ง IP Packet ออกไปยังปลายทาง</li>
+                </ol>
+            </div>
+
+            <h3>4.4 Penultimate Hop Popping (PHP)</h3>
+            <p>
+                เป็นเทคนิคที่ Router ก่อนถึง Egress จะถอด Label ออกก่อน เพื่อลดภาระ Egress Router ทำให้ Egress Router
+                ไม่ต้องทำงานสองอย่างพร้อมกัน (ถอด Label และ IP Lookup)
+            </p>
+        </section>
+
+        <section id="traffic-engineering">
+            <h2>5. Traffic Engineering (MPLS-TE)</h2>
+            <p>
+                MPLS สามารถบังคับเส้นทาง Packet ให้วิ่งตามที่เราต้องการ (ไม่ใช่วิ่งตาม IGP Metric) โดยใช้
+                <strong>RSVP-TE</strong>
+            </p>
+
+            <div class="card-container">
+                <div class="card">
+                    <h3>ความสามารถของ MPLS-TE</h3>
+                    <ul>
+                        <li>ตั้งเส้นทาง (Explicit Path) ได้ตามต้องการ</li>
+                        <li>จองแบนด์วิธล่วงหน้า (Bandwidth Reservation)</li>
+                        <li>ใช้ Constraint-based Routing เพื่อเลือกเส้นทางที่เหมาะสม</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>ประโยชน์ของ MPLS-TE</h3>
+                    <ul>
+                        <li>สามารถกระจาย Traffic ให้สมดุล</li>
+                        <li>เลือกเส้นทางที่มี Delay ต่ำสำหรับ Traffic ที่ต้องการความเร็ว</li>
+                        <li>หลีกเลี่ยงลิงก์ที่ใกล้เต็มความจุ</li>
+                        <li>ลดความเสี่ยงจากการเกิด Congestion</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="note">
+                <p>การทำ MPLS-TE ต้องอาศัยการปรับแต่ง IGP (OSPF หรือ IS-IS)
+                    เพื่อให้สามารถส่งข้อมูลเกี่ยวกับทรัพยากรของเครือข่าย เช่น แบนด์วิธที่เหลือ ซึ่งปกติ IGP
+                    จะไม่มีข้อมูลเหล่านี้</p>
+            </div>
+        </section>
+
+        <section id="mpls-vpn">
+            <h2>6. MPLS VPN (MPLS Layer 3 VPN)</h2>
+            <p>
+                การใช้ MPLS เพื่อเชื่อมเครือข่าย Private หลายๆ Site ผ่านเครือข่าย Service Provider โดยแยก Traffic
+                ของลูกค้าแต่ละรายออกจากกัน
+            </p>
+
+            <h3>Key Concept</h3>
+            <ul>
+                <li><strong>VRF (Virtual Routing and Forwarding):</strong> Routing Table แยกตามลูกค้า</li>
+                <li><strong>MP-BGP (Multiprotocol BGP):</strong> แจก Route พร้อม Label</li>
+                <li><strong>PE (Provider Edge Router):</strong> ทำหน้าที่ใส่/ถอด Label และแยก VPN</li>
+                <li><strong>P (Provider Router):</strong> Router ภายในของผู้ให้บริการที่ไม่รู้จักข้อมูล VPN</li>
+                <li><strong>CE (Customer Edge Router):</strong> Router ของลูกค้าที่เชื่อมต่อกับ PE</li>
+            </ul>
+
+            <div class="highlight">
+                <p><strong>Label 2 ชั้น</strong></p>
+                <ul>
+                    <li><strong>Outer Label:</strong> สำหรับส่งใน Core Network (Transport Label)</li>
+                    <li><strong>Inner Label:</strong> สำหรับระบุ VPN (VPN Label)</li>
+                </ul>
+            </div>
+
+            <div class="diagram">
+                <img src="./architecture.png" alt="MPLS VPN Architecture">
+                <p><em>ภาพแสดงสถาปัตยกรรมของ MPLS Layer 3 VPN</em></p>
+            </div>
+
+            <h3>ประโยชน์ของ MPLS VPN</h3>
+            <ul>
+                <li>แยก Traffic ของลูกค้าแต่ละรายได้อย่างสมบูรณ์</li>
+                <li>รองรับการใช้งาน IP Address ซ้ำกันระหว่างลูกค้าต่างราย</li>
+                <li>ลดความซับซ้อนในการบริหารจัดการเครือข่าย</li>
+                <li>สามารถรองรับการเชื่อมต่อได้หลากหลายรูปแบบ (Full-Mesh, Hub-and-Spoke, Partial-Mesh)</li>
+            </ul>
+        </section>
+
+        <section id="mpls-qos">
+            <h2>7. MPLS QoS</h2>
+            <p>
+                MPLS สามารถรองรับการทำ Quality of Service (QoS) เพื่อจัดลำดับความสำคัญของ Traffic ต่างๆ
+                ได้อย่างมีประสิทธิภาพ
+            </p>
+            <ul>
+                <li>ใช้ <strong>Exp field</strong> (3 bits) บน Label Header สำหรับการทำ Class of Service (CoS)</li>
+                <li>สามารถทำ Priority Queuing, Policing, Shaping ตาม Exp value ได้</li>
+                <li>รองรับการ Map ค่า QoS จาก IP DSCP เข้าสู่ MPLS Exp และ Map กลับเมื่อออกจากเครือข่าย MPLS</li>
+            </ul>
+
+            <div class="note">
+                <p>เดิม Exp field มีชื่อว่า "CoS field" แต่ปัจจุบันมักเรียกว่า "TC field" (Traffic Class) ในมาตรฐานใหม่
+                </p>
+            </div>
+
+            <h3>MPLS QoS Model</h3>
+            <ul>
+                <li><strong>Pipe Model:</strong> ค่า QoS ภายใน MPLS Network ไม่ส่งผลต่อ QoS ในขาออก</li>
+                <li><strong>Uniform Model:</strong> ค่า QoS มีการส่งผ่านตลอดทั้งเครือข่าย</li>
+                <li><strong>Short Pipe Model:</strong> ผสมระหว่าง Pipe และ Uniform</li>
+            </ul>
+        </section>
+
+        <section id="protection">
+            <h2>8. MPLS Protection Mechanisms</h2>
+            <p>
+                MPLS มีกลไกป้องกันความเสียหายเมื่อเกิดการล่มของเครือข่าย (Network Failure) หลายรูปแบบ:
+            </p>
+
+            <h3>Fast Reroute (FRR)</h3>
+            <p>
+                เทคโนโลยีที่ช่วยให้เครือข่ายสามารถเปลี่ยนเส้นทางได้อย่างรวดเร็วเมื่อเกิดความเสียหาย
+                โดยมีเป้าหมายให้การเปลี่ยนเส้นทางใช้เวลาน้อยกว่า 50 ms
+            </p>
+            <ul>
+                <li><strong>Link Protection:</strong> ป้องกันเฉพาะลิงก์ที่เสียหาย</li>
+                <li><strong>Node Protection:</strong> ป้องกันทั้ง Node ที่เสียหาย</li>
+            </ul>
+
+            <h3>MPLS-TE Backup LSPs</h3>
+            <p>
+                การสร้างเส้นทางสำรองล่วงหน้า (Backup LSP) เพื่อใช้ในกรณีที่เส้นทางหลักมีปัญหา
+            </p>
+            <ul>
+                <li><strong>One-to-One Backup:</strong> สร้าง Backup LSP แยกเป็นรายๆ
+                </li>
+            </ul>
+        </section>
+        <section id="protection">
+            <h2>9. MPLS Basic commands</h2>
+            <p>
+                คำสั่งที่ใช้เกี่ยวกับการตั้งค่าและตรวจสอบ MPLS Protection มีดังนี้:
+            </p>
+        
+            <h3>Enable MPLS on Interface</h3>
+            <p>
+                <code>mpls ip</code><br>
+                ใช้เปิดการทำงาน MPLS บน interface
+            </p>
+        
+            <h3>กำหนดช่วงหมายเลข Label ใน Global Configuration</h3>
+            <p>
+                <code>mpls label range 200 299</code><br>
+                (แนะนำให้ reload หลังจากตั้งค่า)
+            </p>
+        
+            <h3>หมายเหตุสำหรับ PE Router</h3>
+            <p>
+                Interface ของ PE Router ที่เชื่อมกับ CE Router ไม่ต้องสั่ง <code>mpls ip</code>
+            </p>
+        
+            <h3>คำสั่งตรวจสอบ MPLS LDP</h3>
+            <p>
+                <code>show mpls ldp neighbor</code><br>
+                ตรวจสอบเพื่อนบ้านที่ใช้ LDP
+            </p>
+        
+            <h3>คำสั่งตรวจสอบ MPLS Label Binding</h3>
+            <p>
+                <code>show mpls ldp bindings</code><br>
+                แสดงการจับคู่ (mapping) ระหว่าง prefix และ label
+            </p>
+        
+            <h3>ดู Binding เฉพาะ Destination ที่ต้องการ</h3>
+            <p>
+                <code>show mpls ldp bindings [Destination network with subnet mask]</code>
+            </p>
+        
+            <h3>ตรวจสอบ Label ที่ติดอยู่ในเส้นทาง</h3>
+            <p>
+                <code>show mpls forwarding-table</code>
+            </p>
+        </section>
+        
+    </main>
+</body>
+
+</html>

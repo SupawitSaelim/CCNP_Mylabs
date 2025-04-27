@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เปรียบเทียบ MPLS Layer 2 VPN vs Layer 3 VPN</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --primary-dark: #1d4ed8;
+            --secondary-color: #f97316;
+            --secondary-dark: #ea580c;
+            --bg-color: #f8fafc;
+            --text-color: #1e293b;
+            --light-gray: #e2e8f0;
+            --dark-gray: #64748b;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        header .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            margin: 2rem 0 1rem;
+            color: var(--primary-dark);
+            border-bottom: 2px solid var(--light-gray);
+            padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            font-size: 1.4rem;
+            margin: 1.5rem 0 1rem;
+            color: var(--secondary-dark);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+            border-radius: var(--border-radius);
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 1rem;
+            text-align: left;
+            border: 1px solid var(--light-gray);
+        }
+
+        .comparison-table th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background-color: #f1f5f9;
+        }
+
+        .highlight {
+            background-color: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid var(--primary-color);
+            padding: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .warning {
+            background-color: rgba(249, 115, 22, 0.1);
+            border-left: 4px solid var(--secondary-color);
+            padding: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .flex-container {
+            display: flex;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .flex-item {
+            flex: 1;
+            min-width: 0;
+            /* Fix for flexbox */
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+        }
+
+        .l2vpn .feature-card::before {
+            background-color: var(--primary-color);
+        }
+
+        .l3vpn .feature-card::before {
+            background-color: var(--secondary-color);
+        }
+
+        .feature-card h3 {
+            margin-top: 0.5rem;
+        }
+
+        code {
+            background-color: #e2e8f0;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+
+        pre {
+            background-color: #1e293b;
+            color: #f8fafc;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+
+        ul,
+        ol {
+            margin-left: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .tag.orange {
+            background-color: var(--secondary-color);
+        }
+
+        .tag.green {
+            background-color: var(--success-color);
+        }
+
+        .tag.yellow {
+            background-color: var(--warning-color);
+            color: var(--text-color);
+        }
+
+        .diagram {
+            max-width: 100%;
+            margin: 2rem auto;
+            display: block;
+            text-align: center;
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        .diagram img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .diagram-caption {
+            text-align: center;
+            margin-top: 1rem;
+            font-style: italic;
+            color: var(--dark-gray);
+        }
+
+        .summary-box {
+            background: linear-gradient(to right, rgba(59, 130, 246, 0.1), rgba(249, 115, 22, 0.1));
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: var(--box-shadow);
+        }
+
+        .summary-box h2 {
+            color: var(--text-color);
+            border-bottom: none;
+            margin-top: 0;
+        }
+
+        .solutions-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            box-shadow: var(--box-shadow);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        .solutions-table th,
+        .solutions-table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border: 1px solid var(--light-gray);
+        }
+
+        .solutions-table th {
+            background-color: var(--dark-gray);
+            color: white;
+            font-weight: 600;
+        }
+
+        .solutions-table tr:nth-child(even) {
+            background-color: #f1f5f9;
+        }
+
+        .note {
+            background-color: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .tip {
+            background-color: #ecfdf5;
+            border-left: 4px solid #10b981;
+            padding: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        footer {
+            background-color: #1e293b;
+            color: white;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+
+        footer .container {
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .flex-container {
+                flex-direction: column;
+            }
+
+            .flex-item {
+                width: 100%;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            h3 {
+                font-size: 1.2rem;
+            }
+
+            .comparison-table th,
+            .comparison-table td {
+                padding: 0.75rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1>🔥 เปรียบเทียบความแตกต่าง</h1>
+            <h2 style="color: white; border: none; margin: 0;">MPLS Layer 2 VPN vs Layer 3 VPN</h2>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h2>เปรียบเทียบภาพรวม</h2>
+            <p>MPLS VPN เป็นเทคโนโลยีที่นิยมใช้ในเครือข่ายขององค์กรและผู้ให้บริการ เพื่อเชื่อมต่อสาขาต่างๆ
+                เข้าด้วยกันอย่างปลอดภัย โดยแบ่งเป็น 2 ประเภทหลักคือ Layer 2 VPN และ Layer 3 VPN
+                ซึ่งมีความแตกต่างในวิธีการทำงานและการใช้งาน</p>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>หัวข้อ</th>
+                        <th>MPLS Layer 2 VPN</th>
+                        <th>MPLS Layer 3 VPN</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>การส่งข้อมูล</td>
+                        <td>ส่ง "เฟรม" ระดับ Layer 2 (เช่น Ethernet Frame, PPP Frame) ระหว่างสาขา</td>
+                        <td>ส่ง "แพ็กเก็ต" ระดับ Layer 3 (IP Packet) โดยทำ Routing ให้เลย</td>
+                    </tr>
+                    <tr>
+                        <td>มองจากมุมมองลูกค้า</td>
+                        <td>ลูกค้าเหมือนได้ "สาย Ethernet" หรือ "Link Layer 2" ข้ามเมือง</td>
+                        <td>ลูกค้าส่ง IP Packet แล้ว Provider จัดการ Routing ทั้งหมดให้</td>
+                    </tr>
+                    <tr>
+                        <td>PE Router (Provider Edge)</td>
+                        <td>ไม่ยุ่งกับ Routing Table ของลูกค้า (แค่ส่ง Layer 2 Frames)</td>
+                        <td>ต้องมี VRF (Virtual Routing and Forwarding) ของแต่ละลูกค้า แยกกัน</td>
+                    </tr>
+                    <tr>
+                        <td>ตัวอย่างบริการ</td>
+                        <td>
+                            - VPWS (Virtual Private Wire Service)<br>
+                            - VPLS (Virtual Private LAN Service)<br>
+                            - EVPN (Ethernet VPN)
+                        </td>
+                        <td>- MPLS L3VPN (RFC 4364)</td>
+                    </tr>
+                    <tr>
+                        <td>ความซับซ้อนของ Provider</td>
+                        <td>ง่าย (เพราะไม่ต้องสนใจ IP Routing ของลูกค้า)</td>
+                        <td>ยาก (ต้อง Manage Routing Table ของลูกค้าหลายราย)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="flex-container">
+            <div class="flex-item l2vpn">
+                <h2>MPLS Layer 2 VPN</h2>
+                <div class="highlight">
+                    <h3 style="margin-top: 0;">สรุปแนวคิด</h3>
+                    <p><strong>"ส่ง Layer 2 Frame ผ่าน MPLS Core"</strong></p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>วิธีทำงาน</h3>
+                    <ul>
+                        <li>ฝั่ง PE Router จะรับ <strong>Ethernet Frame</strong> หรือ <strong>PPP Frame</strong>
+                            จากลูกค้า</li>
+                        <li>ทำ Encapsulation เป็น MPLS Packet</li>
+                        <li>ส่งผ่าน MPLS Backbone</li>
+                        <li>ปลายทาง PE ถอดออก ส่ง Ethernet Frame ไปยังลูกค้า</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <h3>ประเภทของ Layer 2 VPN</h3>
+                    <div>
+                        <span class="tag">VPWS</span>
+                        <h4>Virtual Private Wire Service</h4>
+                        <p>Point-to-Point L2 Connection (เหมือนสายเช่า Metro Ethernet)</p>
+                    </div>
+                    <hr style="margin: 1rem 0; border-top: 1px solid var(--light-gray);">
+                    <div>
+                        <span class="tag">VPLS</span>
+                        <h4>Virtual Private LAN Service</h4>
+                        <p>L2 Multipoint-to-Multipoint (เหมือนสร้าง LAN เสมือนให้หลาย Site เห็นกันเหมือนอยู่ Hub
+                            เดียวกัน)</p>
+                    </div>
+                    <hr style="margin: 1rem 0; border-top: 1px solid var(--light-gray);">
+                    <div>
+                        <span class="tag">EVPN</span>
+                        <h4>Ethernet VPN</h4>
+                        <p>รุ่นใหม่ ใช้ BGP แจก MAC Address (มี Multihoming, Load Balancing ดีขึ้นกว่า VPLS เยอะ)</p>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <h3>Protocols ที่ใช้ใน L2VPN</h3>
+                    <ul>
+                        <li>LDP (Label Distribution Protocol)</li>
+                        <li>BGP (ในกรณี EVPN)</li>
+                        <li>Pseudowire Control Word (บางกรณี เช่น VPWS)</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <h3>ข้อดีของ Layer 2 VPN</h3>
+                    <ul>
+                        <li>ลูกค้าควบคุม Routing ได้เอง</li>
+                        <li>ง่ายต่อการ Migration จากเครือข่ายเดิม</li>
+                        <li>รองรับ Non-IP Protocol</li>
+                        <li>Provider ไม่ต้องรู้ IP ของลูกค้า</li>
+                        <li>เหมาะกับการเชื่อมต่อ Data Center</li>
+                    </ul>
+                </div>
+
+                <div class="tip">
+                    <h4>ใช้เมื่อไหร่ดี?</h4>
+                    <p>เหมาะสำหรับลูกค้าที่:</p>
+                    <ul>
+                        <li>ต้องการควบคุม Routing Protocol เอง</li>
+                        <li>มีทีม Network ที่มีความสามารถ</li>
+                        <li>ต้องการความยืดหยุ่นสูง</li>
+                        <li>ใช้ Protocol พิเศษที่ไม่ใช่ IP</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="flex-item l3vpn">
+                <h2>MPLS Layer 3 VPN</h2>
+                <div class="warning">
+                    <h3 style="margin-top: 0;">สรุปแนวคิด</h3>
+                    <p><strong>"ส่ง IP Packet ผ่าน MPLS Core"</strong></p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>วิธีทำงาน</h3>
+                    <ul>
+                        <li>ฝั่ง PE Router จะรับ <strong>IP Packet</strong> จากลูกค้า</li>
+                        <li>เลือก VRF ของลูกค้าคนนั้น</li>
+                        <li>ทำ Lookup ใน VRF แล้วดูว่าต้องส่งผ่าน Label อะไร</li>
+                        <li>ใส่ 2 ชั้น Label
+                            <ul>
+                                <li>Outer Label → ส่งข้าม Core</li>
+                                <li>Inner Label → ระบุ VPN</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <h3>โพรโทคอลที่ใช้</h3>
+                    <ul>
+                        <li><strong>MP-BGP (Multiprotocol BGP)</strong> = แจก VPNv4/VPNv6 Routes</li>
+                        <li><strong>LDP</strong> หรือ <strong>Segment Routing</strong> = แจก Label Path ภายใน Core</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <h3>หัวใจสำคัญของ MPLS L3VPN</h3>
+                    <ul>
+                        <li><strong>VRF (Virtual Routing and Forwarding)</strong>: Routing Table แยกตามลูกค้า</li>
+                        <li><strong>Route Distinguisher (RD)</strong>: ทำให้ Prefix ของแต่ละลูกค้าไม่ชนกัน</li>
+                        <li><strong>Route Target (RT)</strong>: กำหนดว่าสาขาไหนเห็น Prefix อะไร</li>
+                        <li><strong>BGP Label Advertisement</strong>: แจกเส้นทาง + Label ผ่าน BGP</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <h3>ข้อดีของ Layer 3 VPN</h3>
+                    <ul>
+                        <li>ลูกค้าไม่ต้องดูแล Routing หลายสาขา</li>
+                        <li>รองรับ Topology แบบ Any-to-Any ได้ง่าย</li>
+                        <li>รองรับจำนวน Site จำนวนมาก</li>
+                        <li>การขยายเครือข่ายทำได้ง่ายกว่า</li>
+                        <li>มี QoS และ Traffic Engineering ที่ดี</li>
+                    </ul>
+                </div>
+
+                <div class="tip">
+                    <h4>ใช้เมื่อไหร่ดี?</h4>
+                    <p>เหมาะสำหรับลูกค้าที่:</p>
+                    <ul>
+                        <li>ต้องการให้ Service Provider จัดการ Routing</li>
+                        <li>มีสาขาจำนวนมาก</li>
+                        <li>ต้องการลด Operational Overhead</li>
+                        <li>ต้องการสร้าง Virtual Network บน Infrastructure เดียว</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>รูปแบบสถาปัตยกรรม</h2>
+
+            <div class="diagram">
+                <img src="./versus.png" alt="เปรียบเทียบ MPLS L2 VPN และ L3 VPN">
+                <div class="diagram-caption">
+                    <p>แบบบน: MPLS Layer 2 VPN - Customer A Site 1 --- L2 Tunnel --- Customer A Site 2 (ลูกค้าจัดการ IP
+                        เอง)</p>
+                    <p>แบบล่าง: MPLS Layer 3 VPN - Customer B Site 1 --- L3 Routed Network --- Customer B Site 2
+                        (Provider ช่วย Routing ให้)</p>
+                </div>
+            </div>
+
+            <h3>การเปรียบเทียบเชิงลึก</h3>
+            <p>เมื่อดูภาพสถาปัตยกรรมจะเห็นความแตกต่างชัดเจนว่า:</p>
+            <ul>
+                <li>L2 VPN: เปรียบเสมือนวางท่อ Layer 2 ระหว่างสาขา โดยลูกค้ายังเห็น Layer 2 ของกันและกัน (MAC Address)
+                    และ Router แต่ละสาขาของลูกค้าจะเรียนรู้เส้นทางของกันและกันโดยตรง</li>
+                <li>L3 VPN: เปรียบเสมือนมี Router ตัวกลางที่จัดการ Routing ให้ โดยลูกค้าทั้งสองฝั่งจะส่ง IP Packet ไปยัง
+                    Provider Edge (PE) Router แล้ว PE จะจัดการส่งต่อไปยังปลายทาง</li>
+            </ul>
+        </div>
+
+        <div class="summary-box">
+            <h2>✨ สรุปความเข้าใจให้สั้นที่สุด</h2>
+            <ul>
+                <li><strong>MPLS Layer 2 VPN:</strong> Provider เหมือน "ขยายสาย LAN" ให้ข้ามเมือง ลูกค้าทำ IP Routing
+                    เอง</li>
+                <li><strong>MPLS Layer 3 VPN:</strong> Provider "ช่วยทำ IP Routing" ให้ลูกค้า (มี VRF แยกให้)</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>🛡️ ตัวอย่าง Solutions ที่ใช้จริงในตลาด</h2>
+            <table class="solutions-table">
+                <thead>
+                    <tr>
+                        <th>Solution</th>
+                        <th>Layer</th>
+                        <th>Vendor ตัวอย่าง</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>VPWS</td>
+                        <td>L2</td>
+                        <td>Cisco, Juniper, Nokia</td>
+                    </tr>
+                    <tr>
+                        <td>VPLS</td>
+                        <td>L2</td>
+                        <td>Cisco, Juniper, Huawei</td>
+                    </tr>
+                    <tr>
+                        <td>EVPN</td>
+                        <td>L2 (และ Hybrid L2/L3)</td>
+                        <td>Cisco (EVPN VXLAN/MPLS), Juniper, Arista</td>
+                    </tr>
+                    <tr>
+                        <td>MPLS L3VPN</td>
+                        <td>L3</td>
+                        <td>Cisco (IOS XR, XE), Juniper (MX Series), Nokia</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="note">
+                <h4>ทิศทางในปัจจุบัน</h4>
+                <p>ในปัจจุบัน EVPN กำลังได้รับความนิยมมากขึ้น เนื่องจากสามารถรองรับได้ทั้ง Layer 2 และ Layer 3 VPN
+                    (Hybrid) และมีความยืดหยุ่นสูง โดยเฉพาะในการทำ Data Center Interconnect (DCI) และ SD-WAN</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🛠️ ข้อพิจารณาในการเลือกใช้</h2>
+
+            <div class="flex-container" style="align-items: stretch;">
+                <div class="flex-item">
+                    <div class="feature-card" style="height: 100%;">
+                        <h3>เลือก Layer 2 VPN เมื่อ</h3>
+                        <ul>
+                            <li>ต้องการควบคุม Routing Protocol เองทั้งหมด</li>
+                            <li>ต้องการให้ Network มีลักษณะเหมือน LAN ข้ามพื้นที่</li>
+                            <li>ต้องการรองรับ Non-IP Protocol</li>
+                            <li>ต้องการความโปร่งใสของ MAC Address</li>
+                            <li>มีทีม Network Engineer ที่มีประสบการณ์</li>
+                            <li>กำลังทำ Data Center Interconnect</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="flex-item">
+                    <div class="feature-card" style="height: 100%;">
+                        <h3>เลือก Layer 3 VPN เมื่อ</h3>
+                        <ul>
+                            <li>ต้องการลดภาระการจัดการ Routing ของตัวเอง</li>
+                            <li>มีสาขาจำนวนมาก</li>
+                            <li>ต้องการ Scalability สูง</li>
+                            <li>ต้องการแยก Traffic ระหว่างแผนกหรือบริษัทย่อย</li>
+                            <li>ต้องการความสะดวกในการขยายเครือข่าย</li>
+                            <li>ต้องการให้ Service Provider จัดการ QoS ให้</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
