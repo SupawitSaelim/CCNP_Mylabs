@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>คู่มือการกำหนดค่า HSRP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --code-bg: #2d3436;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Sarabun', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f7fa;
+            padding-bottom: 50px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 30px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .section {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        h2 {
+            color: var(--secondary-color);
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--light-color);
+        }
+        
+        h3 {
+            color: var(--dark-color);
+            font-size: 1.4rem;
+            margin: 25px 0 15px;
+        }
+        
+        p {
+            margin-bottom: 15px;
+            font-size: 1.05rem;
+        }
+        
+        ul, ol {
+            margin-bottom: 20px;
+            padding-left: 20px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        .highlight {
+            background-color: rgba(52, 152, 219, 0.1);
+            border-left: 4px solid var(--primary-color);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .note {
+            background-color: rgba(241, 196, 15, 0.1);
+            border-left: 4px solid var(--warning-color);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .code-block {
+            background-color: var(--code-bg);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+            position: relative;
+        }
+        
+        .code-block pre {
+            color: #f8f8f2;
+            font-family: monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .copy-btn:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .tag {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 4px;
+            padding: 3px 8px;
+            font-size: 0.8rem;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        
+        .part-heading {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-weight: 600;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .config-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        .config-table th, .config-table td {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        
+        .config-table th {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .config-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .diagram {
+            max-width: 100%;
+            margin: 20px auto;
+            display: block;
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .command {
+            background-color: #f1f1f1;
+            border-left: 4px solid var(--dark-color);
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 0 4px 4px 0;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        
+        #toc {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        #toc h3 {
+            margin-top: 0;
+        }
+        
+        #toc ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        #toc ul li {
+            margin-bottom: 10px;
+        }
+        
+        #toc a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color 0.2s;
+            padding: 5px 0;
+            display: inline-block;
+        }
+        
+        #toc a:hover {
+            color: var(--accent-color);
+            text-decoration: underline;
+        }
+        
+        .tabs {
+            margin: 20px 0;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            margin-bottom: -1px;
+        }
+        
+        .tab-btn {
+            padding: 10px 20px;
+            background-color: #f1f1f1;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+        }
+        
+        .tab-btn.active {
+            background-color: white;
+            border-bottom: 1px solid white;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 0 0 5px 5px;
+            background-color: white;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>คู่มือการกำหนดค่า HSRP</h1>
+            <p>Hot Standby Router Protocol สำหรับ IPv4 และ IPv6</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div id="toc">
+            <h3>สารบัญ</h3>
+            <ul>
+                <li><a href="#intro">ส่วนที่ 1: ทฤษฎีเกี่ยวกับ HSRP</a></li>
+                <li><a href="#part2">ส่วนที่ 2: การกำหนดค่าและสังเกตการณ์ HSRP สำหรับ IPv4 และ IPv6</a></li>
+                <li><a href="#part25">ส่วนที่ 2.5: การปรับแต่ง HSRPv2 Timers</a></li>
+                <li><a href="#part3">ส่วนที่ 3: การกำหนดค่า HSRP Authentication</a></li>
+                <li><a href="#part4">ส่วนที่ 4: การกำหนดค่าและสังเกตการณ์ HSRP Object Tracking</a></li>
+            </ul>
+        </div>
+
+        <div class="section" id="intro">
+            <h2>ส่วนที่ 1: ทฤษฎีเกี่ยวกับ HSRP</h2>
+            
+            <h3>HSRP คืออะไร?</h3>
+            <p>Hot Standby Router Protocol (HSRP) เป็นโปรโตคอลที่พัฒนาโดย Cisco เพื่อให้ความสามารถในการทำ First Hop Redundancy Protocol (FHRP) ซึ่งช่วยเพิ่มความพร้อมใช้งาน (High Availability) ของเกตเวย์เริ่มต้นในเครือข่าย</p>
+            
+            <div class="highlight">
+                <p>HSRP ช่วยให้อุปกรณ์เครือข่ายสามารถทำงานร่วมกันเพื่อนำเสนอเกตเวย์เสมือน (Virtual Gateway) ที่ทำงานเป็นเกตเวย์เริ่มต้นสำหรับอุปกรณ์ปลายทางในเครือข่าย</p>
+            </div>
+            
+            <h3>เวอร์ชันของ HSRP</h3>
+            <ul>
+                <li><strong>HSRPv1</strong> - เวอร์ชันดั้งเดิม สนับสนุนเฉพาะ IPv4</li>
+                <li><strong>HSRPv2</strong> - เวอร์ชันที่ปรับปรุงแล้ว สนับสนุนทั้ง IPv4 และ IPv6, มีความสามารถเพิ่มเติมและประสิทธิภาพที่ดีกว่า</li>
+            </ul>
+            
+            <div class="note">
+                <p><strong>หมายเหตุ:</strong> ในการกำหนดค่า HSRPv2 จำเป็นต้องใช้คำสั่ง <code>standby version 2</code> ก่อนการกำหนดค่าอื่นๆ</p>
+            </div>
+            
+            <h3>พารามิเตอร์สำคัญของ HSRP</h3>
+            
+            <table class="config-table">
+                <tr>
+                    <th>พารามิเตอร์</th>
+                    <th>คำอธิบาย</th>
+                    <th>ค่าเริ่มต้น</th>
+                </tr>
+                <tr>
+                    <td>Group Number</td>
+                    <td>หมายเลขกลุ่ม HSRP (1-4095 สำหรับ HSRPv2)</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>Priority</td>
+                    <td>ค่าความสำคัญที่ใช้เพื่อกำหนดว่าอุปกรณ์ใดควรเป็น Active Router</td>
+                    <td>100</td>
+                </tr>
+                <tr>
+                    <td>Hello Time</td>
+                    <td>ระยะเวลาระหว่างการส่งข้อความ Hello</td>
+                    <td>3 วินาที (HSRPv1), 1 วินาที (HSRPv2)</td>
+                </tr>
+                <tr>
+                    <td>Hold Time</td>
+                    <td>ระยะเวลาที่อุปกรณ์จะรอก่อนที่จะถือว่า Active Router ล้มเหลว</td>
+                    <td>10 วินาที (HSRPv1), 3 วินาที (HSRPv2)</td>
+                </tr>
+                <tr>
+                    <td>Preemption</td>
+                    <td>อนุญาตให้อุปกรณ์ที่มีค่าความสำคัญสูงกว่าสามารถแทนที่อุปกรณ์ที่มีค่าความสำคัญต่ำกว่าเป็น Active Router</td>
+                    <td>ปิดใช้งาน</td>
+                </tr>
+            </table>
+
+            <h3>พอร์ตการสื่อสารของ HSRP</h3>
+            <p>HSRP ใช้พอร์ต UDP หมายเลข 1985 สำหรับการสื่อสารระหว่างอุปกรณ์ในกลุ่ม HSRP เดียวกัน มีการส่งแพ็กเกจไปยังที่อยู่มัลติแคสต์:</p>
+            <ul>
+                <li>HSRPv1: 224.0.0.2 (IPv4)</li>
+                <li>HSRPv2: 224.0.0.102 (IPv4) หรือ FF02::66 (IPv6)</li>
+            </ul>
+
+            <h3>สถานะของ HSRP</h3>
+            <div class="tabs">
+                <div class="tab-buttons">
+                    <button class="tab-btn active" onclick="openTab(event, 'states')">HSRP States</button>
+                    <button class="tab-btn" onclick="openTab(event, 'transitions')">State Transitions</button>
+                </div>
+                <div id="states" class="tab-content active">
+                    <ul>
+                        <li><strong>Initial</strong> - สถานะเริ่มต้นเมื่อ HSRP เพิ่งเริ่มต้น</li>
+                        <li><strong>Listen</strong> - อุปกรณ์รับข้อความ Hello แต่ยังไม่เข้าร่วมในการเลือกตั้ง</li>
+                        <li><strong>Speak</strong> - อุปกรณ์ส่งข้อความ Hello และเข้าร่วมในการเลือกตั้ง</li>
+                        <li><strong>Standby</strong> - อุปกรณ์เป็นตัวเลือกถัดไปที่จะเป็น Active Router</li>
+                        <li><strong>Active</strong> - อุปกรณ์ทำหน้าที่ส่งต่อแพ็กเกจและตอบสนองต่อ ARP</li>
+                    </ul>
+                </div>
+                <div id="transitions" class="tab-content">
+                    <p>การเปลี่ยนสถานะใน HSRP เกิดขึ้นตามเงื่อนไขต่างๆ:</p>
+                    <ul>
+                        <li>เมื่อมีการเริ่มต้น interface อุปกรณ์จะเข้าสู่สถานะ <strong>Listen</strong></li>
+                        <li>หลังจากนั้นจะเข้าสู่สถานะ <strong>Speak</strong> เพื่อเข้าร่วมการเลือกตั้ง</li>
+                        <li>อุปกรณ์ที่มี priority สูงสุดจะเข้าสู่สถานะ <strong>Active</strong></li>
+                        <li>อุปกรณ์ที่มี priority สูงรองลงมาจะเข้าสู่สถานะ <strong>Standby</strong></li>
+                        <li>อุปกรณ์อื่นๆ จะคงอยู่ในสถานะ <strong>Listen</strong></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" id="part2">
+            <div class="part-heading">🔹 ส่วนที่ 2: การกำหนดค่าและสังเกตการณ์ HSRP สำหรับ IPv4 และ IPv6</div>
+            
+            <h3>Switch D1 Configuration:</h3>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                <pre>interface vlan 11
+standby version 2
+standby 11 ip 10.11.0.254
+standby 11 priority 150
+standby 11 preempt
+standby 116 ipv6 autoconfig
+standby 116 priority 150
+standby 116 preempt
+
+interface vlan 21
+standby version 2
+standby 21 ip 10.21.0.254
+standby 21 preempt
+standby 216 ipv6 autoconfig
+standby 216 preempt</pre>
+            </div>
+
+            <h3>Switch D2 Configuration:</h3>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                <pre>interface vlan 11
+standby version 2
+standby 11 ip 10.11.0.254
+standby 11 preempt
+standby 116 ipv6 autoconfig
+standby 116 preempt
+
+interface vlan 21
+standby version 2
+standby 21 ip 10.21.0.254
+standby 21 priority 150
+standby 21 preempt
+standby 216 ipv6 autoconfig
+standby 216 priority 150
+standby 216 preempt</pre>
+            </div>
+
+            <div class="highlight">
+                <p><strong>คำอธิบาย:</strong> ในการกำหนดค่าข้างต้น, D1 มีค่า priority สูงกว่า (150) สำหรับ VLAN 11 และ D2 มีค่า priority สูงกว่า (150) สำหรับ VLAN 21 ซึ่งหมายความว่า D1 จะเป็น Active Router สำหรับ VLAN 11 และ D2 จะเป็น Active Router สำหรับ VLAN 21</p>
+            </div>
+
+            <h3>ตรวจสอบ HSRP:</h3>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                <pre>show standby brief</pre>
+            </div>
+
+            <p>คำสั่งเพิ่มเติมสำหรับการตรวจสอบ HSRP:</p>
+            <div class="command">show standby</div>
+            <div class="command">show standby vlan 11</div>
+            <div class="command">show standby vlan 21</div>
+            <div class="command">show standby all</div>
+        </div>
+
+        <div class="section" id="part25">
+            <div class="part-heading">🔹 ส่วนที่ 2.5: การปรับแต่ง HSRPv2 Timers</div>
+            
+            <p>การปรับแต่ง Timers ช่วยลดเวลาในการตรวจจับความล้มเหลวและการกู้คืน ทำให้การเปลี่ยนแปลงระหว่าง Active Router และ Standby Router เร็วขึ้น</p>
+
+            <div class="note">
+                <p><strong>ข้อควรระวัง:</strong> ก่อนทำการปรับแต่ง Timers ให้ทำการ <code>shutdown</code> VLAN interface ก่อนและเปิด <code>no shutdown</code> หลังจากการตั้งค่าเสร็จสิ้น เพื่อป้องกันความผิดพลาดที่อาจเกิดขึ้นระหว่างการเปลี่ยนแปลง</p>
+            </div>
+
+            <h3>ลดเวลาตรวจจับล้มเหลว:</h3>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                <pre>interface vlan 11
+standby 11 timers msec 250 msec 750
+
+interface vlan 21
+standby 21 timers msec 250 msec 750</pre>
+            </div>
+
+            <div class="highlight">
+                <p><strong>คำอธิบาย:</strong> คำสั่งข้างต้นกำหนดให้ Hello Time เป็น 250 มิลลิวินาที (0.25 วินาที) และ Hold Time เป็น 750 มิลลิวินาที (0.75 วินาที) ซึ่งทำให้การตรวจจับความล้มเหลวของ Active Router เร็วขึ้นมาก</p>
+            </div>
+        </div>
+
+        <div class="section" id="part3">
+            <div class="part-heading">🔹 ส่วนที่ 3: การกำหนดค่า HSRP Authentication</div>
+            
+            <p>การรับรองความถูกต้อง (Authentication) เป็นสิ่งสำคัญเพื่อป้องกันการโจมตีแบบปลอมแปลง HSRP หรือการแทรกแซงการทำงานของ HSRP ในเครือข่าย</p>
+
+            <h3>Switch D1 Authentication:</h3>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                <pre>interface vlan 11
+standby 11 authentication md5 key-string Super53cret
+
+interface vlan 21
+standby 21 authentication md5 key-string Super53cret</pre>
+            </div>
+
+            <div class="note">
+                <p><strong>หมายเหตุสำคัญ:</strong> ต้องทำการกำหนดค่าเดียวกันบน D2 เพื่อให้ HSRP สามารถทำงานได้ทั้งคู่ หากค่าต่างกันจะเกิด mismatch และ HSRP จะล้มเหลว</p>
+            </div>
+
+            <h3>วิธีการรับรองความถูกต้องใน HSRP:</h3>
+            <ul>
+                <li><strong>Plain Text Authentication</strong> - ใช้รหัสผ่านแบบข้อความธรรมดา (ไม่แนะนำสำหรับการใช้งานจริง)</li>
+                <li><strong>MD5 Authentication</strong> - ใช้การเข้ารหัสแบบ MD5 ซึ่งปลอดภัยกว่า</li>
+            </ul>
+        </div>
+
+        <div class="section" id="part4">
+            <div class="part-heading">🔹 ส่วนที่ 4: การกำหนดค่าและสังเกตการณ์ HSRP Object Tracking</div>
+            
+            <p>Object Tracking ช่วยให้ HSRP สามารถปรับตัวตามสถานะของอินเทอร์เฟสหรือทรัพยากรอื่นๆ ในเครือข่าย ช่วยเพิ่มความยืดหยุ่นและความน่าเชื่อถือในการทำงาน</p>
+
+            <h3>Step 1: สร้าง Tracked Object</h3>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                <pre>track 1 interface g0/1 line-protocol</pre>
+            </div>
+
+            <h3>Step 2: นำ Object Tracking มาใช้กับ HSRP</h3>
+            <p>ตัวอย่างให้ลด priority ลง 50 เมื่อ track interface ล้มเหลว:</p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                <pre>interface vlan 11
+standby 11 track 1 decrement 50
+
+interface vlan 21
+standby 21 track 1 decrement 50</pre>
+            </div>
+
+            <div class="highlight">
+                <p><strong>คำอธิบาย:</strong> เมื่อลิงก์ที่ track อยู่นั้นล้มเหลว (เช่น G0/1 down) router จะลด priority และถ้าต่ำกว่าอีกฝั่งที่มี preemption ก็จะยอมสละสถานะ active ทำให้เกิดการ failover ไปยัง Standby Router โดยอัตโนมัติ</p>
+            </div>
+
+            <h3>ประเภทของ Object Tracking:</h3>
+            <ul>
+                <li><strong>Interface Line Protocol</strong> - ติดตามสถานะของอินเทอร์เฟส (up/down)</li>
+                <li><strong>IP Route Reachability</strong> - ติดตามความสามารถในการเข้าถึงเส้นทาง IP</li>
+                <li><strong>IP SLA Operations</strong> - ติดตามผลลัพธ์ของการดำเนินการ IP SLA</li>
+            </ul>
+
+            <div class="note">
+                <p><strong>เคล็ดลับ:</strong> ใช้ Object Tracking ร่วมกับ preemption เพื่อให้เกิดการ failover อัตโนมัติเมื่อลิงก์กลับมาทำงานปกติ</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function copyCode(button) {
+            const codeBlock = button.nextElementSibling;
+            const text = codeBlock.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                }, 2000);
+            });
+        }
+        
+        function openTab(evt, tabName) {
+            var i, tabContent, tabButtons;
+            
+            tabContent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabContent.length; i++) {
+                tabContent[i].classList.remove("active");
+            }
+            
+            tabButtons = document.getElementsByClassName("tab-btn");
+            for (i = 0; i < tabButtons.length; i++) {
+                tabButtons[i].classList.remove("active");
+            }
+            
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+    </script>
+</body>
+</html>
