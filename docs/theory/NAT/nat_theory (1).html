@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ทฤษฎีของ NAT (Network Address Translation)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            background-color: #f9f9f9;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #3498db;
+        }
+        h2 {
+            color: #2980b9;
+            font-size: 1.8rem;
+            margin-top: 30px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+        h3 {
+            color: #3498db;
+            font-size: 1.4rem;
+        }
+        ul, ol {
+            padding-left: 25px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        .highlight {
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 12px 20px;
+            margin: 20px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        .code-block {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: monospace;
+            margin: 15px 0;
+            position: relative;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 4px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .copy-btn:hover {
+            background-color: #2980b9;
+        }
+        .nat-type {
+            display: flex;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .nat-type-box {
+            flex: 1;
+            min-width: 300px;
+            margin: 10px;
+            padding: 20px;
+            background-color: #ecf0f1;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        .nat-type-box h3 {
+            margin-top: 0;
+            color: #2980b9;
+        }
+        .nat-diagram {
+            margin: 30px auto;
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+        .tip {
+            background-color: #d5f5e3;
+            border-left: 4px solid #2ecc71;
+            padding: 10px 15px;
+            margin: 15px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        .warning {
+            background-color: #fdedec;
+            border-left: 4px solid #e74c3c;
+            padding: 10px 15px;
+            margin: 15px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .toggle-content {
+            background-color: #f1f8fe;
+            border: 1px solid #d1e4fb;
+            border-radius: 5px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        .toggle-btn {
+            background-color: #d1e4fb;
+            color: #2980b9;
+            border: none;
+            width: 100%;
+            text-align: left;
+            padding: 12px 20px;
+            font-family: 'Sarabun', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .toggle-btn:after {
+            content: "+";
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .toggle-btn.active:after {
+            content: "-";
+        }
+        .toggle-content-body {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ทฤษฎีของ NAT (Network Address Translation)</h1>
+        
+        <section id="intro">
+            <h2>1. NAT คืออะไร</h2>
+            <p>NAT (Network Address Translation) เป็นกระบวนการที่ใช้ในการแปลง IP Address ที่อยู่ภายในเครือข่าย (Private IP) ให้เป็น IP Address ที่สามารถใช้ได้บนอินเทอร์เน็ต (Public IP)</p>
+            
+            <div class="highlight">
+                <p>NAT ทำหน้าที่เป็นตัวกลางระหว่างเครือข่ายภายใน (LAN) และเครือข่ายภายนอก (WAN) โดยทำการแปลงที่อยู่ IP เพื่อให้อุปกรณ์ภายในสามารถสื่อสารกับโลกภายนอกได้</p>
+            </div>
+            
+            <div class="tip">
+                <strong>ข้อมูลเพิ่มเติม:</strong> ช่วงของ Private IP Address ที่ใช้ในเครือข่ายภายใน ตามมาตรฐาน RFC 1918 คือ:
+                <ul>
+                    <li>10.0.0.0 - 10.255.255.255 (10.0.0.0/8)</li>
+                    <li>172.16.0.0 - 172.31.255.255 (172.16.0.0/12)</li>
+                    <li>192.168.0.0 - 192.168.255.255 (192.168.0.0/16)</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="nat-types">
+            <h2>2. ประเภทของ NAT</h2>
+            
+            <div class="nat-type">
+                <div class="nat-type-box">
+                    <h3>2.1 Static NAT</h3>
+                    <ul>
+                        <li>แปลง IP แบบ 1 ต่อ 1 ระหว่าง Private กับ Public IP</li>
+                        <li>ใช้ในกรณีที่ต้องการให้เครื่องภายในเข้าถึงจากภายนอกแบบคงที่</li>
+                        <li>เหมาะสำหรับ Server ที่จำเป็นต้องมี Public IP คงที่</li>
+                        <li>สิ้นเปลือง Public IP เนื่องจากต้องใช้ 1 IP ต่อ 1 อุปกรณ์</li>
+                    </ul>
+                </div>
+                
+                <div class="nat-type-box">
+                    <h3>2.2 Dynamic NAT</h3>
+                    <ul>
+                        <li>ใช้กลุ่ม Public IP ที่มีจำกัด เพื่อแปลง IP ของเครื่องภายในแบบสุ่ม</li>
+                        <li>เมื่อ Public IP ถูกใช้หมด การแปลจะรอจนกว่าจะมี IP ว่าง</li>
+                        <li>เหมาะสำหรับเครือข่ายที่มี Public IP หลายตัว แต่ไม่ต้องการใช้มากเท่า Static NAT</li>
+                        <li>ไม่เหมาะกับเครือข่ายขนาดใหญ่ที่มีอุปกรณ์จำนวนมาก</li>
+                    </ul>
+                </div>
+                
+                <div class="nat-type-box">
+                    <h3>2.3 PAT (Port Address Translation)</h3>
+                    <ul>
+                        <li>หรือเรียกว่า NAT Overloading</li>
+                        <li>แปลงหลาย Private IP ให้ใช้ Public IP เดียว โดยแยกด้วยหมายเลขพอร์ต</li>
+                        <li>เป็นรูปแบบที่นิยมใช้ที่สุดในเครือข่ายบ้านและองค์กร</li>
+                        <li>ประหยัด Public IP อย่างมาก เนื่องจากใช้พอร์ตเป็นตัวแยกการเชื่อมต่อ</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="toggle-content">
+                <button class="toggle-btn">การทำงานของ NAT (เพิ่มเติม)</button>
+                <div class="toggle-content-body">
+                    <h3>กระบวนการทำงานของ NAT</h3>
+                    <ol>
+                        <li><strong>การเริ่มเชื่อมต่อ:</strong> เมื่ออุปกรณ์ในเครือข่ายภายในต้องการเชื่อมต่อกับเครือข่ายภายนอก เช่น อินเทอร์เน็ต</li>
+                        <li><strong>การแปลงที่อยู่:</strong> อุปกรณ์ NAT (เช่น Router) จะแปลง Source IP จาก Private IP เป็น Public IP</li>
+                        <li><strong>การสร้างตารางการแปลง:</strong> NAT จะบันทึกข้อมูลการแปลงไว้ในตาราง NAT Translation Table</li>
+                        <li><strong>การส่งแพ็คเก็ตออก:</strong> แพ็คเก็ตถูกส่งออกไปยังปลายทางด้วย Public IP</li>
+                        <li><strong>การรับแพ็คเก็ตตอบกลับ:</strong> เมื่อมีการตอบกลับ อุปกรณ์ NAT จะค้นหาในตารางการแปลง และส่งข้อมูลกลับไปยังอุปกรณ์ภายในที่ถูกต้อง</li>
+                    </ol>
+                    
+                    <p>ในกรณีของ PAT (Overloading) จะมีการบันทึกทั้ง IP Address และ Port Number เพื่อแยกแยะการเชื่อมต่อของแต่ละอุปกรณ์ที่ใช้ Public IP เดียวกัน</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="nat-benefits">
+            <h2>3. ประโยชน์ของ NAT</h2>
+            <ul>
+                <li><strong>ช่วยประหยัดการใช้ Public IP:</strong> แก้ปัญหาการขาดแคลน IPv4 โดยใช้ Private IP ภายในเครือข่าย</li>
+                <li><strong>ซ่อนโครงสร้างภายในเครือข่าย:</strong> ปกปิดรายละเอียดของโครงสร้างเครือข่ายภายใน ทำให้ยากต่อการโจมตีจากภายนอก</li>
+                <li><strong>เพิ่มความปลอดภัยในระดับหนึ่ง:</strong> การเชื่อมต่อจากภายนอกจะถูกบล็อกโดยอัตโนมัติ เว้นแต่จะมีการตั้งค่า Port Forwarding</li>
+                <li><strong>ง่ายต่อการจัดการเครือข่าย:</strong> สามารถเปลี่ยนแปลง ISP หรือ Public IP โดยไม่ต้องเปลี่ยนแปลงการตั้งค่าเครือข่ายภายใน</li>
+                <li><strong>รองรับการย้ายหรือรวมเครือข่าย:</strong> ช่วยให้สามารถรวมเครือข่ายที่มีช่วง IP ซ้ำกันได้</li>
+            </ul>
+            
+            <div class="warning">
+                <strong>ข้อจำกัดของ NAT:</strong>
+                <ul>
+                    <li>บางโปรโตคอลและแอปพลิเคชันที่ต้องการการเชื่อมต่อโดยตรงอาจมีปัญหาเมื่อใช้งานผ่าน NAT</li>
+                    <li>การทำ Port Forwarding เพิ่มความซับซ้อนในการจัดการ</li>
+                    <li>อาจเพิ่มความล่าช้า (Latency) เล็กน้อยเนื่องจากการประมวลผลการแปลงที่อยู่</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="nat-commands">
+            <h2>🔸 คำสั่งที่จำเป็นสำหรับ NAT บน Cisco IOS</h2>
+            
+            <h3>1. สร้าง ACL เพื่อระบุ Traffic ที่จะทำ NAT</h3>
+            <div class="code-block">
+                <button class="copy-btn">คัดลอก</button>
+                access-list 1 permit 192.168.1.0 0.0.0.255
+            </div>
+            
+            <h3>2. กำหนด NAT Overload (PAT)</h3>
+            <div class="code-block">
+                <button class="copy-btn">คัดลอก</button>
+                ip nat inside source list 1 interface FastEthernet0/0 overload
+            </div>
+            
+            <h3>3. ระบุ Interface ที่อยู่ภายใน (inside) และภายนอก (outside)</h3>
+            <div class="code-block">
+                <button class="copy-btn">คัดลอก</button>
+                interface FastEthernet0/1
+                ip address 192.168.1.1 255.255.255.0
+                ip nat inside
+                
+                interface FastEthernet0/0
+                ip address 203.0.113.1 255.255.255.0
+                ip nat outside
+            </div>
+            
+            <h3>4. สำหรับ Static NAT</h3>
+            <div class="code-block">
+                <button class="copy-btn">คัดลอก</button>
+                ip nat inside source static 192.168.1.100 203.0.113.100
+            </div>
+            
+            <h3>5. สำหรับ Dynamic NAT</h3>
+            <div class="code-block">
+                <button class="copy-btn">คัดลอก</button>
+                ip nat pool PUBLIC 203.0.113.10 203.0.113.20 netmask 255.255.255.0
+                ip nat inside source list 1 pool PUBLIC
+            </div>
+
+            <div class="toggle-content">
+                <button class="toggle-btn">คำสั่งเพิ่มเติมและการตรวจสอบ NAT</button>
+                <div class="toggle-content-body">
+                    <h3>คำสั่งสำหรับ Port Forwarding</h3>
+                    <div class="code-block">
+                        <button class="copy-btn">คัดลอก</button>
+                        ip nat inside source static tcp 192.168.1.100 80 203.0.113.1 80
+                    </div>
+                    
+                    <h3>คำสั่งตรวจสอบการทำงานของ NAT</h3>
+                    <div class="code-block">
+                        <button class="copy-btn">คัดลอก</button>
+                        show ip nat translations
+                        show ip nat statistics
+                    </div>
+                    
+                    <h3>คำสั่งลบ NAT Translation ที่มีอยู่</h3>
+                    <div class="code-block">
+                        <button class="copy-btn">คัดลอก</button>
+                        clear ip nat translation *
+                    </div>
+                    
+                    <h3>คำสั่ง Debug NAT</h3>
+                    <div class="code-block">
+                        <button class="copy-btn">คัดลอก</button>
+                        debug ip nat
+                    </div>
+                </div>
+            </div>
+            
+            <div class="toggle-content">
+                <button class="toggle-btn">ตัวอย่างการตั้งค่า NAT แบบสมบูรณ์</button>
+                <div class="toggle-content-body">
+                    <h3>ตัวอย่างการตั้งค่า NAT Overload แบบสมบูรณ์</h3>
+                    <div class="code-block">
+                        <button class="copy-btn">คัดลอก</button>
+                        ! กำหนด ACL สำหรับระบุเครือข่ายภายในที่จะทำ NAT <br>
+                        access-list 1 permit 192.168.1.0 0.0.0.255 <br>
+                        access-list 1 permit 192.168.2.0 0.0.0.255 <br><br>
+                        
+                        ! กำหนด NAT Overload <br>
+                        ip nat inside source list 1 interface GigabitEthernet0/0 overload <br><br>
+                        
+                        ! กำหนด Interface ภายใน <br>
+                        interface GigabitEthernet0/1 <br>
+                         ip address 192.168.1.1 255.255.255.0 <br>
+                         ip nat inside <br><br>
+                        
+                        interface GigabitEthernet0/2 <br>
+                         ip address 192.168.2.1 255.255.255.0 <br>
+                         ip nat inside <br><br>
+                        
+                        ! กำหนด Interface ภายนอก <br>
+                        interface GigabitEthernet0/0 <br>
+                         ip address 203.0.113.1 255.255.255.0 <br>
+                         ip nat outside
+                    </div>
+                    
+                    <h3>ตัวอย่างการตั้งค่า Static NAT และ Port Forwarding แบบสมบูรณ์</h3>
+                    <div class="code-block">
+                        <button class="copy-btn">คัดลอก</button>
+                        ! กำหนด Static NAT 1:1 <br>
+                        ip nat inside source static 192.168.1.100 203.0.113.100 <br><br>
+                        
+                        ! กำหนด Port Forwarding สำหรับ Web Server <br>
+                        ip nat inside source static tcp 192.168.1.10 80 203.0.113.1 80 <br><br>
+                        
+                        ! กำหนด Port Forwarding สำหรับ HTTPS <br>
+                        ip nat inside source static tcp 192.168.1.10 443 203.0.113.1 443 <br><br>
+                        
+                        ! กำหนด Port Forwarding สำหรับ SSH <br>
+                        ip nat inside source static tcp 192.168.1.20 22 203.0.113.1 2222 <br><br>
+                        
+                        ! กำหนด Interface ภายใน <br>
+                        interface GigabitEthernet0/1 <br>
+                         ip address 192.168.1.1 255.255.255.0 <br>
+                         ip nat inside <br><br>
+                        
+                        ! กำหนด Interface ภายนอก <br>
+                        interface GigabitEthernet0/0 <br>
+                         ip address 203.0.113.1 255.255.255.0 <br>
+                         ip nat outside
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="advanced-topics">
+            <h2>เนื้อหาเพิ่มเติม: NAT ขั้นสูง</h2>
+            
+            <div class="toggle-content">
+                <button class="toggle-btn">NAT กับ IPv6</button>
+                <div class="toggle-content-body">
+                    <p>ในโลกของ IPv6 แนวคิดของ NAT มีการเปลี่ยนแปลง เนื่องจาก IPv6 มีจำนวน IP Address มากพอที่จะรองรับอุปกรณ์ทุกชิ้นในโลก โดยไม่จำเป็นต้องใช้ NAT เพื่อประหยัด IP</p>
+                    
+                    <h3>NAT64 และ DNS64</h3>
+                    <p>เป็นเทคโนโลยีที่ช่วยให้เครือข่าย IPv6 สามารถสื่อสารกับเครือข่าย IPv4 ได้ โดย:</p>
+                    <ul>
+                        <li><strong>NAT64:</strong> แปลงแพ็คเก็ตระหว่าง IPv6 และ IPv4</li>
+                        <li><strong>DNS64:</strong> สร้าง IPv6 Address สำหรับเว็บไซต์ที่มีเฉพาะ IPv4 เพื่อให้อุปกรณ์ IPv6 สามารถเชื่อมต่อได้</li>
+                    </ul>
+                    
+                    <h3>NPTv6 (Network Prefix Translation)</h3>
+                    <p>NPTv6 เป็นรูปแบบของ NAT สำหรับ IPv6 ที่แปลงเฉพาะ Prefix ของเครือข่าย โดยไม่เปลี่ยนส่วน Interface ID ทำให้การติดตามและความเป็นส่วนตัวยังคงอยู่</p>
+                </div>
+            </div>
+            
+            <div class="toggle-content">
+                <button class="toggle-btn">NAT Traversal และปัญหาที่เกี่ยวข้อง</button>
+                <div class="toggle-content-body">
+                    <p>NAT Traversal คือวิธีการที่ช่วยให้การเชื่อมต่อสามารถผ่าน NAT ได้ โดยเฉพาะสำหรับแอปพลิเคชันที่ต้องการการเชื่อมต่อแบบ Peer-to-Peer</p>
+                    
+                    <h3>เทคนิค NAT Traversal</h3>
+                    <ul>
+                        <li><strong>STUN (Session Traversal Utilities for NAT):</strong> ช่วยให้อุปกรณ์ค้นหา Public IP และประเภทของ NAT</li>
+                        <li><strong>TURN (Traversal Using Relays around NAT):</strong> ใช้เซิร์ฟเวอร์กลางเพื่อส่งต่อข้อมูลระหว่างอุปกรณ์</li>
+                        <li><strong>ICE (Interactive Connectivity Establishment):</strong> รวมเทคนิค STUN และ TURN เข้าด้วยกัน</li>
+                        <li><strong>UPnP (Universal Plug and Play):</strong> อนุญาตให้แอปพลิเคชันเปิดพอร์ตบนอุปกรณ์ NAT โดยอัตโนมัติ</li>
+                    </ul>
+                    
+                    <div class="warning">
+                        <strong>ความปลอดภัย:</strong> UPnP มีความเสี่ยงด้านความปลอดภัย เนื่องจากอนุญาตให้แอปพลิเคชันเปิดพอร์ตโดยไม่มีการตรวจสอบยืนยัน ควรใช้ด้วยความระมัดระวัง
+                    </div>
+                </div>
+            </div>
+            
+            <div class="toggle-content">
+                <button class="toggle-btn">CGNAT (Carrier-Grade NAT)</button>
+                <div class="toggle-content-body">
+                    <p>CGNAT หรือ LSN (Large-Scale NAT) เป็นเทคโนโลยีที่ ISP ใช้เพื่อแบ่งปัน Public IP ให้กับลูกค้าหลายราย</p>
+                    
+                    <h3>การทำงานของ CGNAT</h3>
+                    <ul>
+                        <li>ISP จัดสรร Private IP (ส่วนใหญ่เป็นช่วง 100.64.0.0/10) ให้กับลูกค้า</li>
+                        <li>อุปกรณ์ CGNAT ของ ISP ทำการแปลง Private IP เหล่านี้เป็น Public IP</li>
+                        <li>ลูกค้าจะเชื่อมต่อกับอินเทอร์เน็ตผ่าน NAT 2 ชั้น:
+                            <ul>
+                                <li>NAT ชั้นแรกคือที่อุปกรณ์ของลูกค้า (เช่น Router บ้าน)</li>
+                                <li>NAT ชั้นที่สองคือที่อุปกรณ์ CGNAT ของ ISP</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    
+                    <div class="warning">
+                        <strong>ผลกระทบของ CGNAT:</strong>
+                        <ul>
+                            <li>การทำ Port Forwarding จะทำได้ยากหรือไม่สามารถทำได้</li>
+                            <li>บางแอปพลิเคชัน เช่น เกมออนไลน์ อาจมีปัญหาในการเชื่อมต่อ</li>
+                            <li>การติดตาม IP เพื่อระบุผู้ใช้จะซับซ้อนขึ้น เนื่องจากหลายผู้ใช้อาจใช้ IP เดียวกัน</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="nat-comparison">
+            <h2>เปรียบเทียบประเภทของ NAT</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>คุณสมบัติ</th>
+                        <th>Static NAT</th>
+                        <th>Dynamic NAT</th>
+                        <th>PAT (Overloading)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>การแปลง IP</td>
+                        <td>1:1 (แบบคงที่)</td>
+                        <td>N:N (แบบสุ่ม)</td>
+                        <td>N:1 (หลาย IP ใช้ IP เดียว)</td>
+                    </tr>
+                    <tr>
+                        <td>การสิ้นเปลือง Public IP</td>
+                        <td>สูง</td>
+                        <td>ปานกลาง</td>
+                        <td>ต่ำ</td>
+                    </tr>
+                    <tr>
+                        <td>การเข้าถึงจากภายนอก</td>
+                        <td>ทำได้โดยตรง</td>
+                        <td>ทำได้ยาก</td>
+                        <td>ต้องทำ Port Forwarding</td>
+                    </tr>
+                    <tr>
+                        <td>ความเสถียร</td>
+                        <td>สูง (คงที่ตลอด)</td>
+                        <td>ปานกลาง (เปลี่ยนแปลงได้)</td>
+                        <td>สูง (คงที่ตามการตั้งค่า)</td>
+                    </tr>
+                    <tr>
+                        <td>การใช้งานทั่วไป</td>
+                        <td>Server, บริการสาธารณะ</td>
+                        <td>เครือข่ายขนาดกลาง</td>
+                        <td>เครือข่ายทั่วไป, บ้าน, องค์กร</td>
+                    </tr>
+                    <tr>
+                        <td>ข้อจำกัด</td>
+                        <td>ใช้ Public IP มาก</td>
+                        <td>อาจหมด IP เมื่อมีการใช้งานพร้อมกันมาก</td>
+                        <td>อาจมีปัญหากับแอพที่ต้องการ IP ตรง</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="troubleshooting">
+            <h2>การแก้ไขปัญหาทั่วไปเกี่ยวกับ NAT</h2>
+            
+            <div class="toggle-content">
+                <button class="toggle-btn">ปัญหาและวิธีแก้ไข NAT</button>
+                <div class="toggle-content-body">
+                    <h3>1. ไม่สามารถเชื่อมต่อออกสู่อินเทอร์เน็ตได้</h3>
+                    <ul>
+                        <li>ตรวจสอบการกำหนด inside/outside interface ว่าถูกต้อง</li>
+                        <li>ตรวจสอบ ACL ว่าครอบคลุมเครือข่ายภายในทั้งหมด</li>
+                        <li>ตรวจสอบการเชื่อมต่อ Interface ภายนอกว่าทำงานปกติ</li>
+                        <li>ใช้คำสั่ง <code>debug ip nat</code> เพื่อดูการทำงานของ NAT แบบ Real-time</li>
+                    </ul>
+                    
+                    <h3>2. บางบริการทำงานไม่ได้ผ่าน NAT</h3>
+                    <ul>
+                        <li>บางโปรโตคอลอาจต้องการการตั้งค่าพิเศษ เช่น SIP, H.323, FTP</li>
+                        <li>พิจารณาใช้ ALG (Application Layer Gateway) ในอุปกรณ์</li>
+                        <li>ตรวจสอบว่าแพ็คเก็ตไม่ใหญ่เกินไปจนเกิดการ Fragment</li>
+                    </ul>
+                    
+                    <h3>3. ตารางการแปลง NAT เต็ม</h3>
+                    <ul>
+                        <li>เพิ่ม Timeout ของ NAT Translations โดยใช้คำสั่ง <code>ip nat translation timeout [seconds]</code></li>
+                        <li>ลด Timeout สำหรับ Protocol ที่ไม่จำเป็นต้องคงการเชื่อมต่อนาน</li>
+                        <li>ตรวจสอบการ Leak ของ Connection โดยใช้คำสั่ง <code>show ip nat translations verbose</code></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="conclusion">
+            <h2>สรุป</h2>
+            <p>NAT เป็นเทคโนโลยีสำคัญที่ช่วยแก้ปัญหาการขาดแคลน IPv4 และเพิ่มความปลอดภัยให้กับเครือข่าย ในปัจจุบันแม้จะมี IPv6 แล้ว แต่ NAT ยังคงมีบทบาทสำคัญในการจัดการเครือข่ายและการรักษาความปลอดภัย การเลือกใช้ประเภทของ NAT ที่เหมาะสมกับความต้องการและการตั้งค่าอย่างถูกต้องจะช่วยให้เครือข่ายทำงานได้อย่างมีประสิทธิภาพและปลอดภัย</p>
+        </section>
+    </div>
+
+    <script>
+        // สคริปต์สำหรับปุ่มคัดลอกโค้ด
+        document.querySelectorAll('.copy-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const codeBlock = this.parentElement;
+                const code = codeBlock.textContent.trim();
+                
+                navigator.clipboard.writeText(code).then(() => {
+                    const originalText = this.textContent;
+                    this.textContent = 'คัดลอกแล้ว!';
+                    setTimeout(() => {
+                        this.textContent = originalText;
+                    }, 2000);
+                });
+            });
+        });
+        
+        // สคริปต์สำหรับส่วนเนื้อหาที่ซ่อนได้
+        document.querySelectorAll('.toggle-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                this.classList.toggle('active');
+                const content = this.nextElementSibling;
+                
+                if (content.style.maxHeight) {
+                    content.style.maxHeight = null;
+                    content.style.padding = '0 20px';
+                } else {
+                    content.style.padding = '20px';
+                    content.style.maxHeight = content.scrollHeight + 40 + 'px';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
