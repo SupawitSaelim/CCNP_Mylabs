@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สรุปทฤษฎี VRRPv3</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Sarabun', sans-serif;
+        }
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+        }
+        h2 {
+            color: #2c3e50;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            padding-left: 10px;
+            border-left: 5px solid #3498db;
+        }
+        h3 {
+            color: #34495e;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        ul, ol {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        .highlight {
+            background-color: #f1f8ff;
+            border-left: 3px solid #3498db;
+            padding: 10px 15px;
+            margin: 15px 0;
+        }
+        .command-block {
+            background-color: #2c3e50;
+            color: #ffffff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: monospace;
+        }
+        .diagram {
+            width: 100%;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border-left: 3px solid #ffc107;
+            padding: 10px 15px;
+            margin: 15px 0;
+        }
+        .tips {
+            background-color: #d4edda;
+            border-left: 3px solid #28a745;
+            padding: 10px 15px;
+            margin: 15px 0;
+        }
+        .comparison {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .comparison th, .comparison td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        .comparison th {
+            background-color: #f2f2f2;
+        }
+        .comparison tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        .tab {
+            overflow: hidden;
+            border: 1px solid #ccc;
+            background-color: #f1f1f1;
+            border-radius: 5px 5px 0 0;
+        }
+        .tab button {
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+            font-size: 16px;
+        }
+        .tab button:hover {
+            background-color: #ddd;
+        }
+        .tab button.active {
+            background-color: #3498db;
+            color: white;
+        }
+        .tabcontent {
+            display: none;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+            animation: fadeEffect 1s;
+        }
+        @keyframes fadeEffect {
+            from {opacity: 0;}
+            to {opacity: 1;}
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔹 สรุปทฤษฎี VRRPv3 🔹</h1>
+
+        <div class="tab">
+            <button class="tablinks active" onclick="openTab(event, 'basics')">พื้นฐาน</button>
+            <button class="tablinks" onclick="openTab(event, 'commands')">คำสั่ง</button>
+            <button class="tablinks" onclick="openTab(event, 'advanced')">ขั้นสูง</button>
+            <button class="tablinks" onclick="openTab(event, 'comparison')">เปรียบเทียบ</button>
+        </div>
+
+        <div id="basics" class="tabcontent" style="display: block;">
+            <h2>1. ความหมาย</h2>
+            <p>VRRP (Virtual Router Redundancy Protocol) คือโปรโตคอลที่ทำให้สามารถมี Default Gateway เสมือน (Virtual Router) ได้ เพื่อความต่อเนื่องของการเชื่อมต่อหาก Gateway จริงตัวใดตัวหนึ่งล่ม</p>
+            
+            <div class="highlight">
+                <p><strong>ความสำคัญ:</strong> VRRPv3 เป็นเวอร์ชั่นที่พัฒนาต่อจาก VRRPv2 โดยเพิ่มการรองรับ IPv6 และปรับปรุงความเร็วในการ Failover ให้ดียิ่งขึ้น</p>
+            </div>
+            
+            <h2>2. จุดเด่น</h2>
+            <ul>
+                <li><strong>Open standard (RFC 5798)</strong> ใช้ข้ามผู้ผลิตได้ ทำให้สามารถทำงานร่วมกันได้ระหว่างอุปกรณ์ต่างผู้ผลิต</li>
+                <li><strong>รองรับ IPv4 และ IPv6</strong> ทำให้ใช้งานได้ทั้งสองโปรโตคอลในเครือข่าย</li>
+                <li><strong>Preemption เปิดใช้งานโดยอัตโนมัติ</strong> ช่วยให้ Router ที่มี Priority สูงกว่าจะกลับมาเป็น Master โดยอัตโนมัติเมื่อกลับมาออนไลน์</li>
+                <li><strong>รองรับ Object Tracking</strong> ปรับลด Priority ตามสถานะของ Interface หรือสิ่งที่ Track ช่วยให้การ Failover มีความชาญฉลาดมากขึ้น</li>
+            </ul>
+            
+            <h2>3. ค่าพื้นฐาน</h2>
+            <ul>
+                <li><strong>Priority</strong> ค่าเริ่มต้น = 100 (สูงสุดคือ 254)</li>
+                <li>Router ที่มี <strong>Priority สูงสุด</strong>จะเป็น Master</li>
+                <li>หาก Priority เท่ากัน IP สูงสุดจะเป็นตัวเลือก</li>
+                <li><strong>Advertisement Interval:</strong> 1 วินาที (สามารถปรับได้ตั้งแต่ 0.1 วินาที)</li>
+            </ul>
+            
+            <h2>4. โครงสร้าง</h2>
+            <p>VRRPv3 ใช้คำสั่ง <code>address-family</code> เพื่อแยก IPv4/IPv6</p>
+            <ul>
+                <li>IPv4 ใช้ IP ปกติ</li>
+                <li>IPv6 ต้องกำหนด <strong>link-local address</strong> เอง (ไม่สร้างให้อัตโนมัติแบบ HSRP)</li>
+            </ul>
+            
+            <div class="diagram">
+                <h3>แผนภาพการทำงานของ VRRP</h3>
+                <pre style="text-align: left;">
+    +-----------------+                +-----------------+
+    |    Router A     |                |    Router B     |
+    |  (Master VRRP)  |                | (Backup VRRP)   |
+    |   Priority 200  |                |   Priority 100  |
+    +--------+--------+                +--------+--------+
+             |                                  |
+             |                                  |
+             +----------------------------------+
+                             |
+                    Virtual IP: 10.0.0.1
+                    Virtual MAC: 00-00-5E-00-01-XX
+                             |
+                             |
+                      +------+------+
+                      |  End Device  |
+                      |  Default GW: |
+                      |   10.0.0.1   |
+                      +-------------+
+                </pre>
+            </div>
+            
+            <div class="tips">
+                <h3>💡 VRRP ทำงานอย่างไร</h3>
+                <ol>
+                    <li>Router ทุกตัวในกลุ่ม VRRP จะถูกกำหนด Group ID และ Virtual IP เดียวกัน</li>
+                    <li>Router ที่มี Priority สูงสุดจะเป็น Master และตอบสนองต่อ ARP Request สำหรับ Virtual IP</li>
+                    <li>Master จะส่ง VRRP Advertisement เป็นระยะๆ เพื่อแจ้งสถานะ</li>
+                    <li>หาก Backup Router ไม่ได้รับ Advertisement เป็นเวลา 3 ครั้งติดต่อกัน จะเริ่มกระบวนการเลือก Master ใหม่</li>
+                    <li>สำหรับ VRRPv3 สามารถตั้งค่า Advertisement Timer ได้ละเอียดถึง 0.1 วินาที</li>
+                </ol>
+            </div>
+            
+            <h2>5. จุดเด่นของ VRRPv3 เมื่อเทียบกับ VRRPv2</h2>
+            <ul>
+                <li><strong>รองรับ IPv6:</strong> เพิ่มความสามารถในการใช้งานใน IPv6 network</li>
+                <li><strong>Advertisement เร็วขึ้น:</strong> สามารถตั้ง timer ได้ละเอียดถึง 0.1 วินาที ช่วยให้การ failover เร็วขึ้น</li>
+                <li><strong>Format คำสั่งใหม่:</strong> ใช้ address-family แยกการตั้งค่า IPv4/IPv6 ชัดเจน</li>
+                <li><strong>รองรับ VMAC (Virtual MAC):</strong> ช่วยลดจำนวน ARP update เมื่อเกิดการ failover</li>
+            </ul>
+        </div>
+
+        <div id="commands" class="tabcontent">
+            <h2>🔸 คำสั่งที่จำเป็นทั้งหมด</h2>
+            
+            <h3>🔹 Global Configuration (เปิด VRRPv3):</h3>
+            <div class="command-block">
+                fhrp version vrrp v3
+            </div>
+            
+            <h3>🔹 สร้าง VRRP group (IPv4):</h3>
+            <div class="command-block">
+                interface vlan XX<br>
+                vrrp &lt;group-id&gt; address-family ipv4<br>
+                address &lt;virtual-ip&gt;<br>
+                priority &lt;value&gt; # (ไม่ใส่ก็จะใช้ค่า default 100)
+            </div>
+            
+            <h3>🔹 สร้าง VRRP group (IPv6):</h3>
+            <div class="command-block">
+                interface vlan XX<br>
+                vrrp &lt;group-id&gt; address-family ipv6<br>
+                address &lt;link-local-address&gt; primary<br>
+                priority &lt;value&gt;
+            </div>
+            
+            <h3>🔹 แสดงสถานะ VRRP:</h3>
+            <div class="command-block">
+                show vrrp<br>
+                show vrrp brief
+            </div>
+            
+            <h3>🔹 สร้าง Object Tracking:</h3>
+            <div class="command-block">
+                track &lt;id&gt; interface &lt;interface-name&gt; line-protocol
+            </div>
+            
+            <h3>🔹 ผูกการ Track กับ VRRP:</h3>
+            <div class="command-block">
+                interface vlan XX<br>
+                vrrp &lt;group-id&gt; address-family &lt;ipv4|ipv6&gt;<br>
+                track &lt;id&gt; decrement &lt;value&gt;
+            </div>
+            
+            <h3>🔹 ตั้งค่า Advertisement Interval:</h3>
+            <div class="command-block">
+                interface vlan XX<br>
+                vrrp &lt;group-id&gt; address-family &lt;ipv4|ipv6&gt;<br>
+                timers advertise &lt;centiseconds&gt;
+            </div>
+            
+            <h3>🔹 ปิดการใช้งาน Preemption:</h3>
+            <div class="command-block">
+                interface vlan XX<br>
+                vrrp &lt;group-id&gt; address-family &lt;ipv4|ipv6&gt;<br>
+                no preempt
+            </div>
+            
+            <h3>🔹 ตั้งค่า Preemption Delay:</h3>
+            <div class="command-block">
+                interface vlan XX<br>
+                vrrp &lt;group-id&gt; address-family &lt;ipv4|ipv6&gt;<br>
+                preempt delay minimum &lt;seconds&gt;
+            </div>
+            
+            <div class="warning">
+                <h3>⚠️ ข้อควรระวังสำหรับ IPv6</h3>
+                <p>เมื่อตั้งค่า VRRP สำหรับ IPv6 ต้องระบุ link-local address เป็น primary ก่อนเสมอ และต้องกำหนด link-local address เอง ไม่เหมือน HSRP ที่สร้างให้อัตโนมัติ</p>
+            </div>
+        </div>
+
+        <div id="advanced" class="tabcontent">
+            <h2>การใช้งานขั้นสูง</h2>
+            
+            <h3>1. การใช้ Object Tracking ที่ซับซ้อน</h3>
+            <p>นอกจากการ track interface แล้ว ยังสามารถติดตามสถานะอื่นๆ ได้:</p>
+            <div class="command-block">
+                ! ติดตาม IP SLA<br>
+                ip sla 1<br>
+                icmp-echo 8.8.8.8<br>
+                frequency 5<br>
+                ip sla schedule 1 start-time now life forever<br>
+                <br>
+                ! สร้าง Track object<br>
+                track 10 ip sla 1 reachability<br>
+                <br>
+                ! ผูกกับ VRRP<br>
+                interface vlan 10<br>
+                vrrp 1 address-family ipv4<br>
+                track 10 decrement 30
+            </div>
+            
+            <h3>2. การตั้งค่า Multiple Virtual IP</h3>
+            <p>VRRPv3 สามารถมีได้หลาย Virtual IP ในกลุ่มเดียวกัน:</p>
+            <div class="command-block">
+                interface vlan 20<br>
+                vrrp 1 address-family ipv4<br>
+                address 192.168.1.1 primary<br>
+                address 192.168.1.2 secondary<br>
+                address 192.168.1.3 secondary
+            </div>
+            
+            <h3>3. การใช้ BFD (Bidirectional Forwarding Detection) กับ VRRP</h3>
+            <p>เพิ่มความเร็วในการตรวจจับความล้มเหลว:</p>
+            <div class="command-block">
+                ! เปิดใช้งาน BFD<br>
+                interface vlan 30<br>
+                bfd interval 200 min_rx 200 multiplier 3<br>
+                <br>
+                ! ผูกกับ VRRP<br>
+                vrrp 1 address-family ipv4<br>
+                bfd
+            </div>
+            
+            <div class="tips">
+                <h3>💡 ทริคการตั้งค่า VRRP อย่างมีประสิทธิภาพ</h3>
+                <ol>
+                    <li><strong>ใช้ค่า Priority ที่มีช่วงห่างกันมากพอ:</strong> เช่น 200 และ 100 แทนที่จะเป็น 101 และ 100 เพื่อให้มีช่องว่างสำหรับการลดค่าจาก tracking</li>
+                    <li><strong>ตั้งค่า Preemption Delay:</strong> เพื่อป้องกันการ flapping เมื่อ interface มีปัญหาไม่เสถียร</li>
+                    <li><strong>ใช้ Object Tracking หลายตัว:</strong> track ทั้ง interface และการเชื่อมต่อ upstream เพื่อให้การ failover ชาญฉลาดมากขึ้น</li>
+                    <li><strong>ตั้งค่า Advertisement Timer ให้เหมาะสม:</strong> ค่าต่ำทำให้ failover เร็วขึ้น แต่อาจเพิ่มภาระให้กับ CPU</li>
+                </ol>
+            </div>
+            
+            <h3>4. การตั้งค่า VRRP สำหรับ IPv6</h3>
+            <div class="command-block">
+                interface vlan 40<br>
+                ipv6 address 2001:db8:1:1::10/64<br>
+                ipv6 address fe80::10 link-local<br>
+                vrrp 2 address-family ipv6<br>
+                address fe80::1 primary<br>
+                address 2001:db8:1:1::1/64<br>
+                priority 200
+            </div>
+            
+            <h3>5. การใช้ VRRP กับ VLAN Interface หลาย Interface (Load Sharing)</h3>
+            <p>การกระจายโหลดโดยให้ Router แต่ละตัวเป็น Master สำหรับ VLAN ต่างกัน:</p>
+            <div class="highlight">
+                <p><strong>Router A</strong></p>
+            </div>
+            <div class="command-block">
+                interface vlan 10<br>
+                vrrp 1 address-family ipv4<br>
+                address 192.168.10.1<br>
+                priority 200<br>
+                <br>
+                interface vlan 20<br>
+                vrrp 2 address-family ipv4<br>
+                address 192.168.20.1<br>
+                priority 100
+            </div>
+            <div class="highlight">
+                <p><strong>Router B</strong></p>
+            </div>
+            <div class="command-block">
+                interface vlan 10<br>
+                vrrp 1 address-family ipv4<br>
+                address 192.168.10.1<br>
+                priority 100<br>
+                <br>
+                interface vlan 20<br>
+                vrrp 2 address-family ipv4<br>
+                address 192.168.20.1<br>
+                priority 200
+            </div>
+        </div>
+
+        <div id="comparison" class="tabcontent">
+            <h2>เปรียบเทียบ FHRP Protocols</h2>
+            
+            <table class="comparison">
+                <tr>
+                    <th>คุณสมบัติ</th>
+                    <th>VRRPv3</th>
+                    <th>HSRPv2</th>
+                    <th>GLBP</th>
+                </tr>
+                <tr>
+                    <td>RFC Standard</td>
+                    <td>Yes (RFC 5798)</td>
+                    <td>No (Cisco Proprietary)</td>
+                    <td>No (Cisco Proprietary)</td>
+                </tr>
+                <tr>
+                    <td>IPv6 Support</td>
+                    <td>Yes</td>
+                    <td>Yes</td>
+                    <td>Yes</td>
+                </tr>
+                <tr>
+                    <td>Preemption</td>
+                    <td>Enabled by default</td>
+                    <td>Disabled by default</td>
+                    <td>Enabled by default</td>
+                </tr>
+                <tr>
+                    <td>Default Priority</td>
+                    <td>100</td>
+                    <td>100</td>
+                    <td>100</td>
+                </tr>
+                <tr>
+                    <td>Virtual MAC</td>
+                    <td>0000.5E00.01xx</td>
+                    <td>0000.0C9F.Fxxx</td>
+                    <td>0007.B400.xxyy</td>
+                </tr>
+                <tr>
+                    <td>Load Balancing</td>
+                    <td>No (Manual config)</td>
+                    <td>No (Manual config)</td>
+                    <td>Yes (Built-in)</td>
+                </tr>
+                <tr>
+                    <td>Min Advertisement</td>
+                    <td>0.1 seconds</td>
+                    <td>0.1 seconds</td>
+                    <td>0.1 seconds</td>
+                </tr>
+                <tr>
+                    <td>Authentication</td>
+                    <td>No (Removed in v3)</td>
+                    <td>MD5</td>
+                    <td>MD5</td>
+                </tr>
+                <tr>
+                    <td>Multicast Address</td>
+                    <td>224.0.0.18</td>
+                    <td>224.0.0.102</td>
+                    <td>224.0.0.102</td>
+                </tr>
+            </table>
+            
+            <div class="highlight">
+                <h3>จุดเด่นของ VRRPv3</h3>
+                <ul>
+                    <li><strong>ความเข้ากันได้:</strong> ทำงานข้ามผู้ผลิตได้ ไม่จำกัดเฉพาะอุปกรณ์ Cisco</li>
+                    <li><strong>ความเร็ว:</strong> Advertisement timer ละเอียดถึง 0.1 วินาที ช่วยให้ failover เร็วขึ้น</li>
+                    <li><strong>IPv6 Native:</strong> ออกแบบมาให้รองรับ IPv6 อย่างเต็มรูปแบบ</li>
+                </ul>
+            </div>
+            
+            <div class="warning">
+                <h3>ข้อจำกัดของ VRRPv3</h3>
+                <ul>
+                    <li><strong>ไม่มี Load Balancing:</strong> ไม่มีกลไก load balancing แบบอัตโนมัติเหมือน GLBP ต้องทำ manual config</li>
+                    <li><strong>ไม่มี Authentication:</strong> VRRPv3 ตัด MD5 authentication ออกไปเพื่อความเรียบง่าย</li>
+                    <li><strong>ทรัพยากร:</strong> การตั้งค่า advertisement interval ต่ำมากอาจเพิ่มภาระให้ CPU</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+
+        // Animation for command blocks
+        document.addEventListener('DOMContentLoaded', function() {
+            const commandBlocks = document.querySelectorAll('.command-block');
+            commandBlocks.forEach(block => {
+                block.addEventListener('mouseover', function() {
+                    this.style.boxShadow = '0 0 10px rgba(52, 152, 219, 0.7)';
+                });
+                block.addEventListener('mouseout', function() {
+                    this.style.boxShadow = 'none';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
